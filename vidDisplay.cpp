@@ -8,6 +8,8 @@
 #include <iostream>
 #include <opencv2/opencv.hpp>
 
+#include "filter.h"
+
 using namespace cv;
 using namespace std;
 
@@ -19,9 +21,11 @@ int main(int argc, char *argv[]) {
      * If users press 's' => save an image to a file
      * If users press 'g' => change the video to greyscale instead of color
      * If users press 'c' => change the video to color again
+     * If users press 'h' => change to the alternative greyscale instead of opencv greyscale
      * Reference code:
      * https://learnopencv.com/read-write-and-display-a-video-using-opencv-cpp-python/
-     * 
+     * https://docs.opencv.org/3.4/de/d25/imgproc_color_conversions.html
+     * https://www.baeldung.com/cs/convert-rgb-to-grayscale
      */
 
     // open video from webcamp
@@ -43,7 +47,10 @@ int main(int argc, char *argv[]) {
     cv::Mat frame;
     cv::Mat grayFrame;
 
-    bool isGreyScaleVideo = false;
+    // 0 indicate that this is RGB video
+    // 1 indicate that this is a greyscale video from opencv
+    // -1 indicate that this is an alternative greyscale video i have generated
+    int isGreyScaleVideo = 0;
 
     while (true) {
         // get a new frame from the camera, treat as a stream
@@ -53,15 +60,20 @@ int main(int argc, char *argv[]) {
             break;
         }
 
-        if (isGreyScaleVideo == true) {
-            // convert color to greyscale through (COLOR_BGR2GRAY)
-            cv::cvtColor(frame, grayFrame, cv::COLOR_BGR2GRAY);
-            // Convert back to BGR for consistent display
-            cv::cvtColor(grayFrame, frame, cv::COLOR_GRAY2BGR);
+        // use cvtColor to convert to greyscale and display it
+        if (isGreyScaleVideo == 1) {
+            greyScale( frame, grayFrame );
+            cv::imshow("Video", grayFrame);
         }
-
-        // Display the current frame         
-        cv::imshow("Video", frame);
+        else if (isGreyScaleVideo == -1)
+        {
+            AlternativeGrayscale(frame, grayFrame);
+            cv::imshow("Video", grayFrame);
+        }
+        // default function to display the color video
+        else {
+            cv::imshow("Video", frame);
+        }
 
         // see if there is a waiting keystroke
         char key = cv::waitKey(10);
@@ -76,13 +88,15 @@ int main(int argc, char *argv[]) {
         }
         else if (key == 'g') {
             printf("Updating the video to grey scale instead of color.\n");
-            // Close the color window
-            isGreyScaleVideo = true;
+            isGreyScaleVideo = 1;
         }
         else if (key == 'c') {
             printf("Updating the video to back to color.\n");
-            // Close the color window
-            isGreyScaleVideo = false;
+            isGreyScaleVideo = 0;
+        }
+        else if (key == 'h') {
+            printf("Updating the video to my greyscale image.\n");
+            isGreyScaleVideo = -1;
         }
     }
 
