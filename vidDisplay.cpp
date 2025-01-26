@@ -22,6 +22,8 @@ int main(int argc, char *argv[]) {
      * If users press 'g' => change the video to greyscale instead of color
      * If users press 'c' => change the video to color again
      * If users press 'h' => change to the alternative greyscale instead of opencv greyscale
+     * If users press 'p' => change to the sepia filter
+     * If users press 'v' => apply sepia filter with vignetting
      * Reference code:
      * https://learnopencv.com/read-write-and-display-a-video-using-opencv-cpp-python/
      * https://docs.opencv.org/3.4/de/d25/imgproc_color_conversions.html
@@ -46,6 +48,7 @@ int main(int argc, char *argv[]) {
     cv::namedWindow("Video", 1); // identifies a window
     cv::Mat frame;
     cv::Mat grayFrame;
+    cv::Mat vignettingFrame;
 
     // 0 indicate that this is RGB video
     // 1 indicate that this is a greyscale video from opencv
@@ -69,6 +72,19 @@ int main(int argc, char *argv[]) {
         {
             AlternativeGrayscale(frame, grayFrame);
             cv::imshow("Video", grayFrame);
+        }
+        // apply sepia filter if user press p
+        else if (isGreyScaleVideo == -2)
+        {
+            SepiaFilter(frame, grayFrame);
+            cv::imshow("Video", grayFrame);
+        }
+        // apply sepia filter with vignetting if user press v
+        else if (isGreyScaleVideo == -3)
+        {
+            SepiaFilter(frame, grayFrame);
+            vignetting(grayFrame, vignettingFrame);
+            cv::imshow("Video", vignettingFrame);
         }
         // default function to display the color video
         else {
@@ -95,8 +111,16 @@ int main(int argc, char *argv[]) {
             isGreyScaleVideo = 0;
         }
         else if (key == 'h') {
-            printf("Updating the video to my greyscale image.\n");
+            printf("Updating the video to my greyscale.\n");
             isGreyScaleVideo = -1;
+        }
+        else if (key == 'p') {
+            printf("Updating the video to my Sepia filter.\n");
+            isGreyScaleVideo = -2;
+        }
+        else if (key == 'v') {
+            printf("Updating the video to Sepia filter with vignetting edge.\n");
+            isGreyScaleVideo = -3;
         }
     }
 
