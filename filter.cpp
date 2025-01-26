@@ -312,7 +312,6 @@ int sobelY3x3( cv::Mat &src, cv::Mat &dst ) {
     return 0;
 }
 
-
 int magnitude( cv::Mat &sx, cv::Mat &sy, cv::Mat &dst ) {
     // check to make sure sx and sy are all CV_16SC3
     // as we are trying to generate a gradient magnitude image from the X and Y Sobel images
@@ -345,6 +344,44 @@ int magnitude( cv::Mat &sx, cv::Mat &sy, cv::Mat &dst ) {
             dst.at<cv::Vec3b>(y, x) = pixelDst;
         }
     }
+    return 0;
+}
 
+int blurQuantize( cv::Mat &src, cv::Mat &dst, int levels ) {
+    /**
+     * function that takes in a color image, blurs the image, 
+     * and then quantizes the image into a fixed number of levels as specified by a parameter.
+     * default levels here is 10.
+     */
+    // check type here in case we were just using the sobel filter with CV_16
+    if (src.type() != CV_8UC3 ) {
+        printf("Type of source frame should be CV_8UC3 as this is sobel images/frame");
+        return -1;
+    }
+
+    cv::Mat blurredFrame;
+    blur5x5_2(src, blurredFrame);
+
+    // create dst image
+    dst = cv::Mat(blurredFrame.size(), CV_8UC3);
+    // bucket size
+    float b = 255.0f / levels;
+
+    // Then you can take a color channel value x and execute xt = x / b, 
+    // followed by the statement xf = xt * b
+    for (int y = 0; y < blurredFrame.rows; ++y) {
+        for (int x = 0; x < blurredFrame.cols; ++x) {
+            cv::Vec3b pixel = blurredFrame.at<cv::Vec3b>(y, x); // Access the blurred pixel
+            cv::Vec3b quantizedPixel;
+
+            for (int c = 0; c < 3; ++c) {
+                // take a color channel value x and execute xt = x / b,
+                int xt = static_cast<int>(pixel[c] / b);
+                // followed by the statement xf = xt * b
+                quantizedPixel[c] = static_cast<uchar>(xt * b);
+            }
+            dst.at<cv::Vec3b>(y, x) = quantizedPixel;
+        }
+    }
     return 0;
 }

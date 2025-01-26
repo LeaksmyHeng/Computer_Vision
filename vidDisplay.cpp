@@ -60,6 +60,8 @@ int main(int argc, char *argv[]) {
     cv::Mat sobelX, sobelY, sobelAbsX, sobelAbsY, sobelVisualX, sobelVisualY;
     // gradient magnitude image
     cv::Mat gradientMagnitude;
+    // blue quantize Mat
+    cv::Mat blurQuantizeFrame;
 
     // 0 indicate that this is RGB video
     // 1 indicate that this is a greyscale video from opencv
@@ -130,6 +132,12 @@ int main(int argc, char *argv[]) {
             magnitude(sobelX, sobelY, gradientMagnitude);
             cv::imshow("Video", gradientMagnitude);
         }
+        else if (isGreyScaleVideo == -9)
+        {
+            // default level to 10
+            blurQuantize(frame, blurQuantizeFrame, 10);
+            cv::imshow("Video", blurQuantizeFrame);
+        }
         // default function to display the color video
         else {
             cv::imshow("Video", frame);
@@ -185,6 +193,10 @@ int main(int argc, char *argv[]) {
         else if (key == 'm') {
             printf("Updating the video to gradient magnitude image.\n");
             isGreyScaleVideo = -8;
+        }
+        else if (key == 'l') {
+            printf("Updating the video to blur quantize .\n");
+            isGreyScaleVideo = -9;
         }
     }
 
