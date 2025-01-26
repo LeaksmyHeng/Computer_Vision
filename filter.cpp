@@ -118,3 +118,57 @@ int vignetting( cv::Mat &src, cv::Mat &dst ) {
     }
     return 0;
 }
+
+
+int blur5x5_1( cv::Mat &src, cv::Mat &dst ) {
+    /**
+     * Implement Gaussian 5x5 filter
+     * Source: https://stackoverflow.com/questions/1696113/how-do-i-gaussian-blur-an-image-without-using-any-in-built-gaussian-functions
+     * 
+     */
+    // clone the source image
+    dst = src.clone();
+
+    // integer approximation of a 5x5 Gaussian
+    int guassianFilter[5][5] = {
+        {1, 2, 4, 2, 1},
+        {2, 4, 8, 4, 2},
+        {4, 8, 16, 8, 4},
+        {2, 4, 8, 4, 2},
+        {1, 2, 4, 2, 1}
+    };
+
+    // loop through each rows and cols
+    // but don't have to modify the outer two rows and columns
+    for (int y = 2; y < src.rows - 2; ++y) {
+        for (int x = 2; x < src.cols - 2; ++x) {
+            
+            // temp variable for color channels
+            int sumR = 0;
+            int sumG = 0;
+            int sumB = 0;
+
+            // total sum of the guassian filter
+            // (1+2+4+2+1)*2+(2+4+8+4+2)*2+4+8+16+8+4 = 100
+            int totalSum = 100;
+
+            // apply filter
+            for (int fy = -2; fy <= 2; ++fy) {
+                for (int fx = -2; fx <= 2; ++fx) {
+                    cv::Vec3b pixel = src.at<cv::Vec3b>(y + fy, x + fx);
+                    // get the filter weight
+                    int filterWeight = guassianFilter[fy + 2][fx + 2];
+                    sumB += pixel[0] * filterWeight;
+                    sumG += pixel[1] * filterWeight;
+                    sumR += pixel[2] * filterWeight;
+                }
+            }
+
+            // normalized the pixel at destination image
+            dst.at<cv::Vec3b>(y, x)[0] = sumB / totalSum;
+            dst.at<cv::Vec3b>(y, x)[1] = sumG / totalSum;
+            dst.at<cv::Vec3b>(y, x)[2] = sumR / totalSum;
+        }
+    }
+    return 0;
+}

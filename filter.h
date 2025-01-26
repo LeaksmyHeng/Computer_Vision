@@ -14,5 +14,6 @@ void greyScale( cv::Mat &src, cv::Mat &dst );
 int AlternativeGrayscale( cv::Mat &src, cv::Mat &dst );
 int SepiaFilter( cv::Mat &src, cv::Mat &dst );
 int vignetting( cv::Mat &src, cv::Mat &dst );
+int blur5x5_1( cv::Mat &src, cv::Mat &dst );
 
 #endif // FILTER_H

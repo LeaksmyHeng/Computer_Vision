@@ -24,6 +24,8 @@ int main(int argc, char *argv[]) {
      * If users press 'h' => change to the alternative greyscale instead of opencv greyscale
      * If users press 'p' => change to the sepia filter
      * If users press 'v' => apply sepia filter with vignetting
+     * if users press 'f' => apply 5*5 blurred filter
+     * if users press 'b' => apply 5*5 blurred filter but using seperable filter instead
      * Reference code:
      * https://learnopencv.com/read-write-and-display-a-video-using-opencv-cpp-python/
      * https://docs.opencv.org/3.4/de/d25/imgproc_color_conversions.html
@@ -49,6 +51,8 @@ int main(int argc, char *argv[]) {
     cv::Mat frame;
     cv::Mat grayFrame;
     cv::Mat vignettingFrame;
+    cv::Mat blurredFilter1;
+    cv::Mat blurredFilter2;
 
     // 0 indicate that this is RGB video
     // 1 indicate that this is a greyscale video from opencv
@@ -86,6 +90,12 @@ int main(int argc, char *argv[]) {
             vignetting(grayFrame, vignettingFrame);
             cv::imshow("Video", vignettingFrame);
         }
+        // apply 5x5 gaussian blurred filter
+        else if (isGreyScaleVideo == -4)
+        {
+            blur5x5_1( frame, blurredFilter1 );
+            cv::imshow("Video", blurredFilter1);
+        }
         // default function to display the color video
         else {
             cv::imshow("Video", frame);
@@ -121,6 +131,10 @@ int main(int argc, char *argv[]) {
         else if (key == 'v') {
             printf("Updating the video to Sepia filter with vignetting edge.\n");
             isGreyScaleVideo = -3;
+        }
+         else if (key == 'f') {
+            printf("Updating the video to Gaussian 5x5 blurred filter.\n");
+            isGreyScaleVideo = -4;
         }
     }
 
