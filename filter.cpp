@@ -311,3 +311,40 @@ int sobelY3x3( cv::Mat &src, cv::Mat &dst ) {
     
     return 0;
 }
+
+
+int magnitude( cv::Mat &sx, cv::Mat &sy, cv::Mat &dst ) {
+    // check to make sure sx and sy are all CV_16SC3
+    // as we are trying to generate a gradient magnitude image from the X and Y Sobel images
+    if (sx.type() != CV_16SC3 || sy.type() != CV_16SC3) {
+        printf("Type of sx and sy should be CV_16SC3 as this is sobel images/frame");
+        return -1;
+    }
+
+    // convert back to regular cv_8UC3 (normal colored frame)
+    dst = cv::Mat(sx.size(), CV_8UC3);
+
+    for (int y = 0; y < sx.rows; ++y) {
+        for (int x = 0; x < sx.cols; ++x) {
+            // Access the pixel values in sx and sy
+            cv::Vec3s pixelSx = sx.at<cv::Vec3s>(y, x);
+            cv::Vec3s pixelSy = sy.at<cv::Vec3s>(y, x);
+
+            // Compute the gradient magnitude for each channel
+            cv::Vec3b pixelDst; // 8-bit destination pixel
+            for (int c = 0; c < 3; ++c) {
+                int gx = pixelSx[c];
+                int gy = pixelSy[c];
+                int mag = static_cast<int>(std::sqrt(gx * gx + gy * gy));
+
+                // Clamp the value to the range [0, 255] and assign to the destination pixel
+                pixelDst[c] = static_cast<uchar>(std::min(mag, 255));
+            }
+
+            // Set the result in the destination image
+            dst.at<cv::Vec3b>(y, x) = pixelDst;
+        }
+    }
+
+    return 0;
+}

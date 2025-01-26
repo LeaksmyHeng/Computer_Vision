@@ -24,7 +24,7 @@ int main(int argc, char *argv[]) {
      * If users press 'h' => change to the alternative greyscale instead of opencv greyscale
      * If users press 'p' => change to the sepia filter
      * If users press 'v' => apply sepia filter with vignetting
-     * if users press 'f' => apply 5*5 blurred filter
+     * if users press 'F' => apply 5*5 blurred filter
      * if users press 'b' => apply 5*5 blurred filter but using seperable filter instead
      * if users press 'x' => apply sobel 3x3 filter horizontal edge
      * if users press 'y' => apply sobel 3x3 filter vertial edge
@@ -166,7 +166,7 @@ int main(int argc, char *argv[]) {
             printf("Updating the video to Sepia filter with vignetting edge.\n");
             isGreyScaleVideo = -3;
         }
-        else if (key == 'f') {
+        else if (key == 'F') {
             printf("Updating the video to Gaussian 5x5 blurred filter.\n");
             isGreyScaleVideo = -4;
         }
