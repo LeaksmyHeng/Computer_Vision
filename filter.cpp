@@ -69,9 +69,9 @@ int SepiaFilter( cv::Mat &src, cv::Mat &dst ) {
             int newGreen = static_cast<int>(red * 0.349 + green * 0.686 + blue * 0.168);
             int newRed = static_cast<int>(red * 0.393 + green * 0.769 + blue * 0.189);
             
-            pixel[2] = cv::saturate_cast<uchar>(newRed);
-            pixel[1] = cv::saturate_cast<uchar>(newGreen);
             pixel[0] = cv::saturate_cast<uchar>(newBlue);
+            pixel[1] = cv::saturate_cast<uchar>(newGreen);
+            pixel[2] = cv::saturate_cast<uchar>(newRed);
         }
     }
     return 0;
@@ -153,6 +153,7 @@ int blur5x5_1( cv::Mat &src, cv::Mat &dst ) {
             int totalSum = 100;
 
             // apply filter
+            // https://www.geeksforgeeks.org/gaussian-filter-generation-c/
             for (int fy = -2; fy <= 2; ++fy) {
                 for (int fx = -2; fx <= 2; ++fx) {
                     cv::Vec3b pixel = src.at<cv::Vec3b>(y + fy, x + fx);
@@ -168,6 +169,66 @@ int blur5x5_1( cv::Mat &src, cv::Mat &dst ) {
             dst.at<cv::Vec3b>(y, x)[0] = sumB / totalSum;
             dst.at<cv::Vec3b>(y, x)[1] = sumG / totalSum;
             dst.at<cv::Vec3b>(y, x)[2] = sumR / totalSum;
+        }
+    }
+    return 0;
+}
+
+int blur5x5_2(cv::Mat &src, cv::Mat &dst) {
+    /**
+     * Implement Gaussian 5x5 filter using separable methods.
+     */
+    dst = src.clone(); // Clone the source image to the destination image
+
+    // Define the 1x5 separable Gaussian kernel
+    int kernel[5] = {1, 2, 4, 2, 1};
+    int kernelSum = 10; // Sum of kernel values (1 + 2 + 4 + 2 + 1)
+
+    // Vertical Pass (1x5 filter)
+    for (int y = 0; y < src.rows; ++y) {  // Loop over rows
+        for (int x = 2; x < src.cols - 2; ++x) {  // Loop over columns
+            int sumB = 0, sumG = 0, sumR = 0;
+
+            // Apply the 1x5 kernel horizontally
+            for (int kx = -2; kx <= 2; ++kx) {
+                // access pixel using pointer ptr
+                cv::Vec3b pixel = src.ptr<cv::Vec3b>(y)[x + kx];
+                int weight = kernel[kx + 2];
+
+                // Accumulate weighted values for each channel
+                sumB += pixel[0] * weight;
+                sumG += pixel[1] * weight;
+                sumR += pixel[2] * weight;
+            }
+
+            // Normalize and set the pixel value in the destination image
+            dst.ptr<cv::Vec3b>(y)[x][0] = sumB / kernelSum;
+            dst.ptr<cv::Vec3b>(y)[x][1] = sumG / kernelSum;
+            dst.ptr<cv::Vec3b>(y)[x][2] = sumR / kernelSum;
+        }
+    }
+
+
+    // Vertical Pass (1x5 filter)
+    for (int x = 0; x < src.cols; ++x) {
+        for (int y = 2; y < src.rows - 2; ++y) {
+            int sumB = 0, sumG = 0, sumR = 0;
+
+            // Apply the 1x5 kernel vertically
+            for (int ky = -2; ky <= 2; ++ky) {
+                cv::Vec3b pixel = src.ptr<cv::Vec3b>(y + ky)[x];
+                int weight = kernel[ky + 2];
+
+                // Accumulate weighted values for each channel
+                sumB += pixel[0] * weight;
+                sumG += pixel[1] * weight;
+                sumR += pixel[2] * weight;
+            }
+
+            // Normalize and set the pixel value in the destination image
+            dst.ptr<cv::Vec3b>(y)[x][0] = sumB / kernelSum;
+            dst.ptr<cv::Vec3b>(y)[x][1] = sumG / kernelSum;
+            dst.ptr<cv::Vec3b>(y)[x][2] = sumR / kernelSum;
         }
     }
     return 0;

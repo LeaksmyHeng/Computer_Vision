@@ -96,6 +96,12 @@ int main(int argc, char *argv[]) {
             blur5x5_1( frame, blurredFilter1 );
             cv::imshow("Video", blurredFilter1);
         }
+        // apply 5x5 gaussian blurred filter using separable methods
+        else if (isGreyScaleVideo == -5)
+        {
+            blur5x5_2( frame, blurredFilter2 );
+            cv::imshow("Video", blurredFilter2);
+        }
         // default function to display the color video
         else {
             cv::imshow("Video", frame);
@@ -132,9 +138,13 @@ int main(int argc, char *argv[]) {
             printf("Updating the video to Sepia filter with vignetting edge.\n");
             isGreyScaleVideo = -3;
         }
-         else if (key == 'f') {
+        else if (key == 'f') {
             printf("Updating the video to Gaussian 5x5 blurred filter.\n");
             isGreyScaleVideo = -4;
+        }
+        else if (key == 'b') {
+            printf("Updating the video to Gaussian 5x5 blurred filter - separable functions.\n");
+            isGreyScaleVideo = -5;
         }
     }
 
