@@ -119,7 +119,6 @@ int vignetting( cv::Mat &src, cv::Mat &dst ) {
     return 0;
 }
 
-
 int blur5x5_1( cv::Mat &src, cv::Mat &dst ) {
     /**
      * Implement Gaussian 5x5 filter
@@ -185,8 +184,8 @@ int blur5x5_2(cv::Mat &src, cv::Mat &dst) {
     int kernelSum = 10; // Sum of kernel values (1 + 2 + 4 + 2 + 1)
 
     // Vertical Pass (1x5 filter)
-    for (int y = 0; y < src.rows; ++y) {  // Loop over rows
-        for (int x = 2; x < src.cols - 2; ++x) {  // Loop over columns
+    for (int y = 0; y < src.rows; ++y) {
+        for (int x = 2; x < src.cols - 2; ++x) {
             int sumB = 0, sumG = 0, sumR = 0;
 
             // Apply the 1x5 kernel horizontally
@@ -231,5 +230,84 @@ int blur5x5_2(cv::Mat &src, cv::Mat &dst) {
             dst.ptr<cv::Vec3b>(y)[x][2] = sumR / kernelSum;
         }
     }
+    return 0;
+}
+
+int sobelX3x3( cv::Mat &src, cv::Mat &dst ) {
+    /**
+     * Implement Sobel 3x3 Sobel Filter horizontally
+     */
+
+    // Create the destination image as CV_16SC3 because if we only do clone,
+    // it is normally cv_8UC3 wich is not right for sobel edge
+    dst = cv::Mat(src.size(), CV_16SC3);
+
+    int sobelFilterX[3][3] = {
+        {-1, 0, 1},
+        {-2, 0, 2},
+        {-1, 0, 1}
+    };
+
+    for (int y = 1; y < src.rows - 1; ++y) {
+        for (int x = 1; x < src.cols - 1; ++x) {
+            int sumB = 0, sumG = 0, sumR = 0;
+
+            // Apply the Sobel X kernel (horizontal edges)
+            for (int ky = -1; ky <= 1; ++ky) {
+                for (int kx = -1; kx <= 1; ++kx) {
+                    cv::Vec3b pixel = src.at<cv::Vec3b>(y + ky, x + kx);
+                    int weight = sobelFilterX[ky + 1][kx + 1];
+
+                    // Accumulate the weighted sums for each channel
+                    sumB += pixel[0] * weight;
+                    sumG += pixel[1] * weight;
+                    sumR += pixel[2] * weight;
+                }
+            }
+
+            // Set the result in the destination image
+            dst.at<cv::Vec3s>(y, x)[0] = sumB;
+            dst.at<cv::Vec3s>(y, x)[1] = sumG;
+            dst.at<cv::Vec3s>(y, x)[2] = sumR;
+        }
+    }
+
+    return 0;
+}
+
+int sobelY3x3( cv::Mat &src, cv::Mat &dst ) {
+    /**
+     * Implement Sobel 3x3 Sobel Filter vertical edge
+     */
+
+    dst = cv::Mat(src.size(), CV_16SC3);
+
+    int sobelFilterY[3][3] = {
+        {-1, -2, -1},
+        {0, 0, 0},
+        {1, 2, 1}
+    };
+    
+    for (int y = 1; y < src.rows - 1; ++y) {
+        for (int x = 1; x < src.cols - 1; ++x) {
+            int sumB = 0, sumG = 0, sumR = 0;
+
+            for (int ky = -1; ky <= 1; ++ky) {
+                for (int kx = -1; kx <= 1; ++kx) {
+                    cv::Vec3b pixel = src.at<cv::Vec3b>(y + ky, x + kx);
+                    int weight = sobelFilterY[ky + 1][kx + 1];
+
+                    sumB += pixel[0] * weight;
+                    sumG += pixel[1] * weight;
+                    sumR += pixel[2] * weight;
+                }
+            }
+
+            dst.at<cv::Vec3s>(y, x)[0] = sumB;
+            dst.at<cv::Vec3s>(y, x)[1] = sumG;
+            dst.at<cv::Vec3s>(y, x)[2] = sumR;
+        }
+    }
+    
     return 0;
 }

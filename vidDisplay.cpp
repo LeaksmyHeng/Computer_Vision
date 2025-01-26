@@ -26,6 +26,9 @@ int main(int argc, char *argv[]) {
      * If users press 'v' => apply sepia filter with vignetting
      * if users press 'f' => apply 5*5 blurred filter
      * if users press 'b' => apply 5*5 blurred filter but using seperable filter instead
+     * if users press 'x' => apply sobel 3x3 filter horizontal edge
+     * if users press 'y' => apply sobel 3x3 filter vertial edge
+     * 
      * Reference code:
      * https://learnopencv.com/read-write-and-display-a-video-using-opencv-cpp-python/
      * https://docs.opencv.org/3.4/de/d25/imgproc_color_conversions.html
@@ -53,6 +56,10 @@ int main(int argc, char *argv[]) {
     cv::Mat vignettingFrame;
     cv::Mat blurredFilter1;
     cv::Mat blurredFilter2;
+    // all for sobel filter
+    cv::Mat sobelX, sobelY, sobelAbsX, sobelAbsY, sobelVisualX, sobelVisualY;
+    // gradient magnitude image
+    cv::Mat gradientMagnitude;
 
     // 0 indicate that this is RGB video
     // 1 indicate that this is a greyscale video from opencv
@@ -102,6 +109,27 @@ int main(int argc, char *argv[]) {
             blur5x5_2( frame, blurredFilter2 );
             cv::imshow("Video", blurredFilter2);
         }
+        else if (isGreyScaleVideo == -6)
+        {
+            sobelX3x3( frame, sobelX );
+            // display image from (0-255)
+            cv::convertScaleAbs(sobelX, sobelVisualX);
+            cv::imshow("Video", sobelVisualX);
+        }
+        else if (isGreyScaleVideo == -7)
+        {
+            sobelY3x3( frame, sobelY );
+            // display image from (0-255)
+            cv::convertScaleAbs(sobelY, sobelVisualY);
+            cv::imshow("Video", sobelVisualY);
+        }
+        else if (isGreyScaleVideo == -8)
+        {
+            sobelX3x3(frame, sobelX);
+            sobelY3x3(frame, sobelY);
+            magnitude(sobelX, sobelY, gradientMagnitude);
+            cv::imshow("Video", gradientMagnitude);
+        }
         // default function to display the color video
         else {
             cv::imshow("Video", frame);
@@ -145,6 +173,18 @@ int main(int argc, char *argv[]) {
         else if (key == 'b') {
             printf("Updating the video to Gaussian 5x5 blurred filter - separable functions.\n");
             isGreyScaleVideo = -5;
+        }
+        else if (key == 'x') {
+            printf("Updating the video to sobelX3x3.\n");
+            isGreyScaleVideo = -6;
+        }
+        else if (key == 'y') {
+            printf("Updating the video to sobelY3x3.\n");
+            isGreyScaleVideo = -7;
+        }
+        else if (key == 'm') {
+            printf("Updating the video to gradient magnitude image.\n");
+            isGreyScaleVideo = -8;
         }
     }
 
