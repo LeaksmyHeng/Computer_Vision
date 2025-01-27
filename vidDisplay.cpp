@@ -183,6 +183,10 @@ int main(int argc, char *argv[]) {
             lowPassFilter(frame, lowPass);
             cv::imshow("Video", lowPass);
         }
+        else if (isGreyScaleVideo == -13) {
+            highPassFilter(frame, highPass);
+            cv::imshow("Video", highPass);
+        }
         // default function to display the color video
         else {
             cv::imshow("Video", frame);
@@ -254,6 +258,10 @@ int main(int argc, char *argv[]) {
         else if (key == 'w') {
             printf("Updating the video to use low pass filter. \n");
             isGreyScaleVideo = -12;
+        }
+        else if (key == 'z') {
+            printf("Updating the video to use high pass filter. \n");
+            isGreyScaleVideo = -13;
         }
     }
 

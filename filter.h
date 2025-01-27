@@ -22,6 +22,6 @@ int magnitude( cv::Mat &sx, cv::Mat &sy, cv::Mat &dst );
 int blurQuantize( cv::Mat &src, cv::Mat &dst, int levels );
 int coolTone( cv::Mat &src, cv::Mat &dst );
 int lowPassFilter(cv::Mat &src, cv::Mat &dst);
-// int highPassFilter(cv::Mat &src, cv::Mat &dst);
+int highPassFilter(cv::Mat &src, cv::Mat &dst);
 
 #endif // FILTER_H

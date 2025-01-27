@@ -409,7 +409,6 @@ int coolTone( cv::Mat &src, cv::Mat &dst ) {
     return 0;
 }
 
-
 int lowPassFilter( cv::Mat &src, cv::Mat &dst ) {
     /**
      * Applying low pass filter to the frame.
@@ -462,6 +461,32 @@ int lowPassFilter( cv::Mat &src, cv::Mat &dst ) {
             dst.at<cv::Vec3b>(y, x)[0] = sumB / totalSum;
             dst.at<cv::Vec3b>(y, x)[1] = sumG / totalSum;
             dst.at<cv::Vec3b>(y, x)[2] = sumR / totalSum;
+        }
+    }
+    return 0;
+}
+
+int highPassFilter(cv::Mat &src, cv::Mat &dst) {
+    /***
+     * Applying high pass filter
+     */
+    dst = src.clone();
+
+    // applying low pass frame first
+    cv::Mat lowPass;
+    lowPassFilter(src, lowPass);
+
+    // I choose not to modify the 2 rows/colums
+    for (int y = 2; y < src.rows - 2; ++y) {
+        for (int x = 2; x < src.cols - 2; ++x) {
+            cv::Vec3b &pixel = dst.at<cv::Vec3b>(y, x);
+            // accessing low pass pixel
+            cv::Vec3b lowPassPixel = lowPass.at<cv::Vec3b>(y, x);
+
+            // sustract low pass result from the src
+            pixel[0] = cv::saturate_cast<uchar>(src.at<cv::Vec3b>(y, x)[0] - lowPassPixel[0]);
+            pixel[1] = cv::saturate_cast<uchar>(src.at<cv::Vec3b>(y, x)[1] - lowPassPixel[1]);
+            pixel[2] = cv::saturate_cast<uchar>(src.at<cv::Vec3b>(y, x)[2] - lowPassPixel[2]);
         }
     }
     return 0;
