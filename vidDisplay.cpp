@@ -9,6 +9,7 @@
 #include <opencv2/opencv.hpp>
 
 #include "filter.h"
+#include "faceDetect.h"
 
 using namespace cv;
 using namespace std;
@@ -28,6 +29,9 @@ int main(int argc, char *argv[]) {
      * if users press 'b' => apply 5*5 blurred filter but using seperable filter instead
      * if users press 'x' => apply sobel 3x3 filter horizontal edge
      * if users press 'y' => apply sobel 3x3 filter vertial edge
+     * if users press 'm' => apply gradient magnitude
+     * if users press 'l' => apply blur quantize
+     * if users press 'f' => apply face detection
      * 
      * Reference code:
      * https://learnopencv.com/read-write-and-display-a-video-using-opencv-cpp-python/
@@ -62,6 +66,8 @@ int main(int argc, char *argv[]) {
     cv::Mat gradientMagnitude;
     // blue quantize Mat
     cv::Mat blurQuantizeFrame;
+    // face detection frame
+    cv::Mat faceDetection;
 
     // 0 indicate that this is RGB video
     // 1 indicate that this is a greyscale video from opencv
@@ -138,6 +144,22 @@ int main(int argc, char *argv[]) {
             blurQuantize(frame, blurQuantizeFrame, 10);
             cv::imshow("Video", blurQuantizeFrame);
         }
+        else if (isGreyScaleVideo == -10) {
+            // this is greyscale image source
+            // I'll use the opencv greyscale one
+            greyScale( frame, grayFrame );
+            std::vector<cv::Rect> faces;
+            detectFaces( grayFrame, faces );
+            cv::Mat faceDetection = frame.clone();  // Make a copy of the original frame
+
+            // Draw rectangles around detected faces on faceDetection image
+            for (const auto& face : faces) {
+                cv::rectangle(faceDetection, face, cv::Scalar(0, 255, 0), 2); // Green rectangles
+            }
+
+            // Display the frame with detected faces
+            cv::imshow("Video", faceDetection);
+        }
         // default function to display the color video
         else {
             cv::imshow("Video", frame);
@@ -197,6 +219,10 @@ int main(int argc, char *argv[]) {
         else if (key == 'l') {
             printf("Updating the video to blur quantize .\n");
             isGreyScaleVideo = -9;
+        }
+        else if (key == 'f') {
+            printf("Updating the video to detect face. \n");
+            isGreyScaleVideo = -10;
         }
     }
 
