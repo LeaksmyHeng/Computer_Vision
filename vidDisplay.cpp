@@ -33,6 +33,13 @@ int main(int argc, char *argv[]) {
      * if users press 'l' => apply blur quantize
      * if users press 'f' => apply face detection
      * 
+     * Part 11 and 12
+     * I was not able to implement onnruntime library; therefore, I'll add a 4th special effect
+     * special effect 1: user press a => apply blurred face only
+     * special effect 2: user press z => apply high pass filter
+     * special effect 3: user press w => apply low pass filter
+     * special effect 4: user press t => apply cool tone filter
+     * 
      * Reference code:
      * https://learnopencv.com/read-write-and-display-a-video-using-opencv-cpp-python/
      * https://docs.opencv.org/3.4/de/d25/imgproc_color_conversions.html
@@ -68,6 +75,8 @@ int main(int argc, char *argv[]) {
     cv::Mat blurQuantizeFrame;
     // face detection frame
     cv::Mat faceDetection;
+    // cool toon frame
+    cv::Mat coolToneFrame;    
 
     // 0 indicate that this is RGB video
     // 1 indicate that this is a greyscale video from opencv
@@ -160,6 +169,11 @@ int main(int argc, char *argv[]) {
             // Display the frame with detected faces
             cv::imshow("Video", faceDetection);
         }
+        else if (isGreyScaleVideo == -11) {
+            coolTone(frame, coolToneFrame);
+            cv::imshow("Video", coolToneFrame);
+
+        }
         // default function to display the color video
         else {
             cv::imshow("Video", frame);
@@ -223,6 +237,10 @@ int main(int argc, char *argv[]) {
         else if (key == 'f') {
             printf("Updating the video to detect face. \n");
             isGreyScaleVideo = -10;
+        }
+        else if (key == 't') {
+            printf("Updating the video to detect face. \n");
+            isGreyScaleVideo = -11;
         }
     }
 

@@ -313,6 +313,9 @@ int sobelY3x3( cv::Mat &src, cv::Mat &dst ) {
 }
 
 int magnitude( cv::Mat &sx, cv::Mat &sy, cv::Mat &dst ) {
+    /***
+     * Implementing gradient magnitude.
+     */
     // check to make sure sx and sy are all CV_16SC3
     // as we are trying to generate a gradient magnitude image from the X and Y Sobel images
     if (sx.type() != CV_16SC3 || sy.type() != CV_16SC3) {
@@ -385,3 +388,24 @@ int blurQuantize( cv::Mat &src, cv::Mat &dst, int levels ) {
     }
     return 0;
 }
+
+int coolTone( cv::Mat &src, cv::Mat &dst ) {
+    /**
+     * This is part 11 and 12 of the project.
+     * I choosed to implement cool toon filter if user press t
+     * Cool Tone is implemented by increasing blue channel, and decrease red channel but leave green as is.
+     */
+    dst = src.clone();
+
+    for (int y = 0; y < src.rows; ++y) {
+        for (int x = 0; x < src.cols; ++x) {
+            cv::Vec3b &pixel = dst.at<cv::Vec3b>(y, x);
+            
+            pixel[0] = cv::saturate_cast<uchar>(pixel[0] * 1.5);
+            pixel[1] = cv::saturate_cast<uchar>(pixel[1]);
+            pixel[2] = cv::saturate_cast<uchar>(pixel[2] * 0.6);
+        }
+    }
+    return 0;
+}
+
