@@ -7,13 +7,13 @@ enable_testing()
 find_package(OpenCV REQUIRED)
 include_directories(${OpenCV_INCLUDE_DIRS})
 
-# # # add_executable(project_1 imgDisplay.cpp)
-# # This is to run the video project
-# add_executable(project_1 vidDisplay.cpp filter.cpp)
+# # add_executable(project_1 imgDisplay.cpp)
+# This is to run the video project
+# add_executable(project_1 vidDisplay.cpp filters.cpp)
 # target_link_libraries(project_1 ${OpenCV_LIBS})
 
 # # to run timeBlur.cpp use this
-# add_executable(timeblurr timeBlur.cpp filter.cpp)
+# add_executable(timeblurr timeBlur.cpp filters.cpp)
 # target_link_libraries(timeblurr ${OpenCV_LIBS})
 
 # # Passing the argument to run the timeBlue.cpp
@@ -23,7 +23,7 @@ include_directories(${OpenCV_INCLUDE_DIRS})
 # )
 
 # To run face detection use this
-add_executable(project_1 vidDisplay.cpp filter.cpp faceDetect.cpp haarcascade_frontalface_alt2.xml)
+add_executable(project_1 vidDisplay.cpp filters.cpp faceDetect.cpp haarcascade_frontalface_alt2.xml)
 target_link_libraries(project_1 ${OpenCV_LIBS})
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})

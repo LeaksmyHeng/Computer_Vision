@@ -8,7 +8,7 @@
 #include <iostream>
 #include <opencv2/opencv.hpp>
 
-#include "filter.h"
+#include "filters.h"
 #include "faceDetect.h"
 
 using namespace cv;

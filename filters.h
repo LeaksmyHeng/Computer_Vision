@@ -1,11 +1,11 @@
 /**
  * Leaksmy Heng
  * Jan 16 2025
- * This is the header file for filter.cpp
+ * This is the header file for filters.cpp
  */
 
-#ifndef FILTER_H
-#define FILTER_H
+#ifndef FILTERS_H
+#define FILTERS_H
 
 #include <opencv2/opencv.hpp>
 
@@ -25,4 +25,4 @@ int lowPassFilter(cv::Mat &src, cv::Mat &dst);
 int highPassFilter(cv::Mat &src, cv::Mat &dst);
 int highPassFaceDetection(cv::Mat &src, cv::Mat &dst);
 
-#endif // FILTER_H
+#endif // FILTERS_H
