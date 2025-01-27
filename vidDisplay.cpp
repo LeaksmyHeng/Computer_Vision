@@ -81,6 +81,8 @@ int main(int argc, char *argv[]) {
     cv::Mat lowPass;
     // high pass filter
     cv::Mat highPass;
+    // high pass filter on face detection
+    cv::Mat highPassOnFaceDetection;
 
 
     // 0 indicate that this is RGB video
@@ -187,6 +189,10 @@ int main(int argc, char *argv[]) {
             highPassFilter(frame, highPass);
             cv::imshow("Video", highPass);
         }
+        else if (isGreyScaleVideo == -14) {
+            highPassFaceDetection(frame, highPassOnFaceDetection);
+            cv::imshow("Video", highPassOnFaceDetection);
+        }
         // default function to display the color video
         else {
             cv::imshow("Video", frame);
@@ -262,6 +268,10 @@ int main(int argc, char *argv[]) {
         else if (key == 'z') {
             printf("Updating the video to use high pass filter. \n");
             isGreyScaleVideo = -13;
+        }
+        else if (key == 'a') {
+            printf("Updating the video to use high pass filter. \n");
+            isGreyScaleVideo = -14;
         }
     }
 

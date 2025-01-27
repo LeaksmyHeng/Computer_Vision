@@ -9,6 +9,7 @@
 #include <opencv2/opencv.hpp>
 
 #include "filter.h"
+#include "faceDetect.h"
 
 using namespace cv;
 using namespace std;
@@ -488,6 +489,41 @@ int highPassFilter(cv::Mat &src, cv::Mat &dst) {
             pixel[1] = cv::saturate_cast<uchar>(src.at<cv::Vec3b>(y, x)[1] - lowPassPixel[1]);
             pixel[2] = cv::saturate_cast<uchar>(src.at<cv::Vec3b>(y, x)[2] - lowPassPixel[2]);
         }
+    }
+    return 0;
+}
+
+int highPassFaceDetection(cv::Mat &src, cv::Mat &dst) {
+    /**
+     * Apply high pass filter on face detection.
+     */
+    // Convert the frame to grayscale
+    cv::Mat grayFrame;
+    greyScale( src, grayFrame );
+
+    // detect faces
+    std::vector<cv::Rect> faces;
+    detectFaces( grayFrame, faces );
+
+    // clone sr to dst
+    dst = src.clone();
+
+    // Draw rectangles around detected faces on dst image
+    for (const auto& face : faces) {
+        cv::rectangle(dst, face, cv::Scalar(0, 255, 0), 2); // Green rectangles
+    }
+
+    cv::Mat faceHighPass;
+    // apply high pass filter on face
+    for (const auto& face : faces) {
+        // Extract face Region of Interest (ROI)
+        cv::Mat faceRegion = src(face);
+
+        // Apply high-pass filter on the face region
+        highPassFilter(faceRegion, faceHighPass);  // Assuming highPassFilter is defined to apply the filter
+
+        // Replace the face area with the high-pass filtered result
+        faceHighPass.copyTo(dst(face));  // Copy the filtered face back to the destination image
     }
     return 0;
 }
