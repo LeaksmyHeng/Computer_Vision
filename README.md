@@ -4,6 +4,7 @@ Name: Leaksmy Heng
 Travel days: 3
 Operation system: Window
 IDE: Visual Studio
+Link to Video demo: https://drive.google.com/file/d/1PkoV7ca2gBN_UH9Ptcmgfyv0U0rNFkLd/view?usp=sharing
 
 - Steps by steps on how to run in Window:
    1. Download and install opencv into your operation systems

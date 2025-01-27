@@ -35,7 +35,7 @@ int main(int argc, char *argv[]) {
      * 
      * Part 11 and 12
      * I was not able to implement onnruntime library; therefore, I'll add a 4th special effect
-     * special effect 1: user press a => apply blurred face only
+     * special effect 1: user press a => apply high filter on face only
      * special effect 2: user press z => apply high pass filter
      * special effect 3: user press w => apply low pass filter
      * special effect 4: user press t => apply cool tone filter
