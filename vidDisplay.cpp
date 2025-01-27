@@ -76,7 +76,12 @@ int main(int argc, char *argv[]) {
     // face detection frame
     cv::Mat faceDetection;
     // cool toon frame
-    cv::Mat coolToneFrame;    
+    cv::Mat coolToneFrame;
+    // low pass filter
+    cv::Mat lowPass;
+    // high pass filter
+    cv::Mat highPass;
+
 
     // 0 indicate that this is RGB video
     // 1 indicate that this is a greyscale video from opencv
@@ -174,6 +179,10 @@ int main(int argc, char *argv[]) {
             cv::imshow("Video", coolToneFrame);
 
         }
+        else if (isGreyScaleVideo == -12) {
+            lowPassFilter(frame, lowPass);
+            cv::imshow("Video", lowPass);
+        }
         // default function to display the color video
         else {
             cv::imshow("Video", frame);
@@ -241,6 +250,10 @@ int main(int argc, char *argv[]) {
         else if (key == 't') {
             printf("Updating the video to detect face. \n");
             isGreyScaleVideo = -11;
+        }
+        else if (key == 'w') {
+            printf("Updating the video to use low pass filter. \n");
+            isGreyScaleVideo = -12;
         }
     }
 

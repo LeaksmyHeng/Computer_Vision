@@ -137,6 +137,10 @@ int blur5x5_1( cv::Mat &src, cv::Mat &dst ) {
         {1, 2, 4, 2, 1}
     };
 
+    // total sum of the guassian filter
+    // (1+2+4+2+1)*2+(2+4+8+4+2)*2+4+8+16+8+4 = 100
+    int totalSum = 100;
+    
     // loop through each rows and cols
     // but don't have to modify the outer two rows and columns
     for (int y = 2; y < src.rows - 2; ++y) {
@@ -146,10 +150,6 @@ int blur5x5_1( cv::Mat &src, cv::Mat &dst ) {
             int sumR = 0;
             int sumG = 0;
             int sumB = 0;
-
-            // total sum of the guassian filter
-            // (1+2+4+2+1)*2+(2+4+8+4+2)*2+4+8+16+8+4 = 100
-            int totalSum = 100;
 
             // apply filter
             // https://www.geeksforgeeks.org/gaussian-filter-generation-c/
@@ -409,3 +409,60 @@ int coolTone( cv::Mat &src, cv::Mat &dst ) {
     return 0;
 }
 
+
+int lowPassFilter( cv::Mat &src, cv::Mat &dst ) {
+    /**
+     * Applying low pass filter to the frame.
+     * The kernal to the low pass filter used in here is a 5x5:
+     * {
+        {1, 1, 1, 1, 1},
+        {1, 1, 1, 1, 1},
+        {1, 1, 1, 1, 1},
+        {1, 1, 1, 1, 1},
+        {1, 1, 1, 1, 1}
+     * }
+     */
+    // clone the source image
+    dst = src.clone();
+
+    // integer approximation of a 5x5
+    int kernel[5][5] = {
+        {1, 1, 1, 1, 1},
+        {1, 1, 1, 1, 1},
+        {1, 1, 1, 1, 1},
+        {1, 1, 1, 1, 1},
+        {1, 1, 1, 1, 1}
+    };
+
+    // total sum of the filter
+    int totalSum = 25;
+    
+    // I choose not to modify the 2 rows/colums
+    for (int y = 2; y < src.rows - 2; ++y) {
+        for (int x = 2; x < src.cols - 2; ++x) {
+            
+            // temp variable for color channels
+            int sumR = 0;
+            int sumG = 0;
+            int sumB = 0;
+
+            // apply filter
+            for (int fy = -2; fy <= 2; ++fy) {
+                for (int fx = -2; fx <= 2; ++fx) {
+                    cv::Vec3b pixel = src.at<cv::Vec3b>(y + fy, x + fx);
+                    // get the filter weight
+                    int filterWeight = kernel[fy + 2][fx + 2];
+                    sumB += pixel[0] * filterWeight;
+                    sumG += pixel[1] * filterWeight;
+                    sumR += pixel[2] * filterWeight;
+                }
+            }
+
+            // normalized the pixel at destination image
+            dst.at<cv::Vec3b>(y, x)[0] = sumB / totalSum;
+            dst.at<cv::Vec3b>(y, x)[1] = sumG / totalSum;
+            dst.at<cv::Vec3b>(y, x)[2] = sumR / totalSum;
+        }
+    }
+    return 0;
+}
