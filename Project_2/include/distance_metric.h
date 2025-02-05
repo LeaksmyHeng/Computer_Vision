@@ -6,6 +6,6 @@
 using namespace cv;
 using namespace std;
 
-float sumOfSquaredDifference(cv::Mat &targetImage, cv::Mat &image);
+double sumOfSquaredDifference(cv::Mat &targetImage, cv::Mat &image);
 
 #endif // DISTANCEMETRIC_H

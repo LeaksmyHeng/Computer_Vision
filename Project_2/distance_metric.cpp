@@ -11,13 +11,13 @@
 using namespace cv;
 using namespace std;
 
-float sumOfSquaredDifference(cv::Mat &targetImage, cv::Mat &image) {
+double sumOfSquaredDifference(cv::Mat &targetImage, cv::Mat &image) {
     /**
      * Function to calculate sum of squared different between two images.
      * Formula SSD = sum of ( (R1 - R2)^2 + (G1 - G2)^2 + (B1 - B2)^2)
      */
 
-    float result = 0.0;
+    double result = 0.0;
 
     // we know targetImage and image will always have the same size as
     // it goes through the feature extraction (7*7)
@@ -44,6 +44,6 @@ float sumOfSquaredDifference(cv::Mat &targetImage, cv::Mat &image) {
         }
     }
 
-    printf("Sum of square result is %f\n", result)
+    // printf("Sum of square result is %f\n", result);
     return result;
 }
