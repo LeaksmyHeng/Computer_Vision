@@ -7,7 +7,7 @@ include_directories(${OpenCV_INCLUDE_DIRS})
 include(CTest)
 enable_testing()
 
-add_executable(main main.cpp features.cpp)
+add_executable(main main.cpp features.cpp distance_metric.cpp)
 target_link_libraries(main ${OpenCV_LIBS})
 
 # Define a new target to run the executable with arguments
