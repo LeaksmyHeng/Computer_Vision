@@ -70,8 +70,9 @@ cv::Mat histogram(const cv::Mat &image, int numberOfBins) {
         }
     }
 
-    // Normalize the histogram using L2 normalization so that the sum of squared values equals 1
-    normalize(feature, feature, 1, 0, cv::NORM_L2, -1, cv::Mat());
+    // Normalize the histogram using L1 normalization so that the sum of squared values equals 1
+    // achieving this by dividing it with total pixel
+    normalize(feature, feature, 1, 0, cv::NORM_L1, -1, cv::Mat());
 
     // Return the histogram
     return feature;

@@ -40,6 +40,7 @@ int main(int argc, char *argv[]) {
         printf("Image file path: %s\n", argv[1]);
         return 1;
     }
+    
 
     /****************** Feature *******************/
     cv::Mat targetImageFeature;
@@ -101,8 +102,7 @@ int main(int argc, char *argv[]) {
                     result = sumOfSquaredDifference(computingFeaturesImage, targetImageFeature);
                 }
                 if (distanceMetric == "histogramIntersection") {
-                    printf("Histogram\n");
-                    result = histogramIntersection(computingFeaturesImage, targetImageFeature);
+                    result = histogramIntersection(targetImageFeature, computingFeaturesImage);
                 }
 
                 // if result is 0 that means we are computing the same image. so skip
@@ -126,7 +126,7 @@ int main(int argc, char *argv[]) {
     for (int i = 0; i < outPutImage && i < resultVector.size(); i++) {
         // .first is key and .second is value
         string imagePath = resultVector[i].first;
-        Mat img = imread(imagePath);
+        cv::Mat img = imread(imagePath);
 
         if (!img.empty()) {
             cout << "Displaying image: " << imagePath << " with SSD: " << resultVector[i].second << endl;

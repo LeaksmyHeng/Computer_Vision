@@ -53,7 +53,7 @@ double histogramIntersection(const cv::Mat &targetImage, const cv::Mat &image) {
      * Function to calculate histogramIntersection between 2 images
      * Histogram intersection = 1 - sum of min(xi, yi)
      */
-    
+
     double result = 0.0;
     // printf("Before looping in histogram intersection\n");
     for (int b = 0; b < targetImage.size[0]; ++b) {
@@ -66,5 +66,5 @@ double histogramIntersection(const cv::Mat &targetImage, const cv::Mat &image) {
     }
 
     // printf("Histogram result is %f\n", result);
-    return result;
+    return 1 - result;
 }
