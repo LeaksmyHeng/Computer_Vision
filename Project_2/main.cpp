@@ -21,12 +21,9 @@ bool compareFileNameAndItsDistanceValue(const std::pair<std::string, double>& a,
 }
 
 int main(int argc, char *argv[]) {
-
-    // there are 5 arguments
-    // if (argc < 5) {
-    //     printf("Error: At least 5 arguments are required. %d were found\n", argc);
-    //     return -1;
-    // }
+    /**
+     * Main function. I use step one where I ran everything in here.
+     */
 
     std::string targetImage = argv[1];
     fs::path imageDatabase = argv[2];
@@ -53,10 +50,13 @@ int main(int argc, char *argv[]) {
     else if (featureComputingMethod == "multiHistogram") {
         targetImageFeature = histogram(target_image);
     }
+    else if (featureComputingMethod == "colorTexture") {
+        targetImageFeature = colorTexture(target_image, 8);
+    }
 
     // checking if imageDatabase exist (for argv[2])
     if (!fs::exists(imageDatabase) || !fs::is_directory(imageDatabase)) {
-        printf("Cannot open directory image database directory");
+        printf("Cannot open directory image database directory\n");
         return -1;
     }
 
@@ -99,6 +99,9 @@ int main(int argc, char *argv[]) {
                 }
                 else if (featureComputingMethod == "multiHistogram") {
                     computingFeaturesImage = histogram(image);
+                }
+                else if (featureComputingMethod == "colorTexture") {
+                    computingFeaturesImage = colorTexture(image, 8);
                 }
 
                 /****************** Distance Metric *******************/

@@ -38,7 +38,7 @@ cv::Mat baselineMatching(const cv::Mat &image) {
     // check if image size is smaller than 7.
     // if it is throw error
     if (image.cols < 7 || image.rows < 7) {
-		printf("Image too small for 7x7 region.\n")
+		printf("Image too small for 7x7 region.\n");
 		return cv::Mat();
     }
 
@@ -128,7 +128,7 @@ cv::Mat multiHistogram(const cv::Mat &image, int numberOfBins = 8) {
 
     // Check if histograms are empty
     if (histTop.empty() || histBottom.empty()) {
-        printf("Either top histogram or bottom histogram is empty.\n")
+        printf("Either top histogram or bottom histogram is empty.\n");
         return cv::Mat();
     }
 
@@ -143,4 +143,94 @@ cv::Mat multiHistogram(const cv::Mat &image, int numberOfBins = 8) {
 
     // Return the concatenated histogram as a cv::Mat
     return concatenatedHist;
+}
+
+
+cv::Mat texture(const cv::Mat& image) {
+	/**
+	 * Computer texture histogram as feature vector.
+	 * In this case, we use Sobel magnitude image and use a histogram of gradient magnitudes as the texture feature. 
+	 */
+
+	// to get to sobel, we need to convert image to grayscale
+	cv::Mat grayScaleImage;
+	cv::cvtColor(image, grayScaleImage, COLOR_BGR2GRAY);
+
+	// in the first project, i created sobel filter not on full image, but start at 1 and end with row-1 or col-1
+	// therefore, I will just call opencv sobel filter here
+	// CV_32F is float - the pixel can have any value between 0-1.0, this is useful for some sets of calculations on data - but it has to be converted into 8bits to save or display by multiplying each pixel by 255
+	// https://stackoverflow.com/questions/8377091/what-are-the-differences-between-cv-8u-and-cv-32f-and-what-should-i-worry-about
+	cv::Mat sobelX, sobelY;
+	cv::Sobel(grayScaleImage, sobelX, CV_32F, 1, 0, 3);
+	cv::Sobel(grayScaleImage, sobelY, CV_32F, 0, 1, 3);
+
+	// compute gradient magnitude now that we have sobelX and sobelY
+	cv::Mat gradientMagnitude;
+	cv::magnitude(sobelX, sobelY, gradientMagnitude);
+
+	// normalized the gradient magnitude to ensure it is between [0,255]
+	// norm_minmax = https://docs.opencv.org/2.4/modules/core/doc/operations_on_arrays.html#normalize
+	cv::normalize(gradientMagnitude, gradientMagnitude, 0, 255, cv::NORM_MINMAX);
+
+	// printf("Showing images");
+	// imshow("Original Image", image);
+    // imshow("Gradient Magnitude", gradientMagnitude);
+	// waitKey(0);
+
+	// turn gradientMagnitude to a histogram
+	int histSize = 8;
+	float rangeStart = 0.0;
+	float rangeEnd = 400.0;
+
+	// initialized histogram to all 0 (1D cause of grayscale)
+	cv::Mat textureHist = cv::Mat::zeros(1, histSize, CV_32F);
+	// calculate binsize
+	float binSize = (rangeEnd - rangeStart) / histSize;
+
+	for (int i=0; i<gradientMagnitude.rows; i++) {
+		for (int j=0; j<gradientMagnitude.cols; j++) {
+			// get mag value at pixel i & j
+			float gradientValue = gradientMagnitude.at<float>(i, j);
+
+			// check if gradient is within range
+			if (gradientValue >= rangeStart && gradientValue < rangeEnd) {
+                // Calculate the corresponding bin index
+                int binIndex = static_cast<int>((gradientValue - rangeStart) / binSize);
+                
+                // Increment the histogram bin
+                if (binIndex >= 0 && binIndex < histSize) {
+                    textureHist.at<float>(0, binIndex)++;
+                }
+            }
+		}
+	}
+
+	// normalized histogram using L1
+	cv::normalize(textureHist, textureHist, 1, 0, cv::NORM_L1);
+	return textureHist;
+}
+
+
+cv::Mat colorTexture(const cv::Mat& image, int numberOfBins = 8) {
+	/***
+	 * Combine the histogram with texture.
+	 */
+
+	cv::Mat colorHistogram = histogram(image, numberOfBins);
+	cv::Mat textureHistogram = texture(image);
+
+	// // combine both color and texture histogram
+	// std::vector<cv::Mat> histograms;
+    // histograms.push_back(colorHistogram);
+    // histograms.push_back(textureHistogram);
+
+	// cv::Mat combinedHist;
+    // cv::hconcat(histograms, combinedHist);
+
+	// cv::normalize(combinedHist, combinedHist, 1, 0, cv::NORM_L1);
+	// return combinedHist;
+	cv::Mat concatenatedHist;
+    cv::hconcat(colorHistogram, textureHistogram, concatenatedHist);
+	cv::normalize(concatenatedHist, concatenatedHist, 0, 1, cv::NORM_L1, -1, cv::Mat());
+	return concatenatedHist;
 }

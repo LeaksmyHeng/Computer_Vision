@@ -33,9 +33,9 @@ target_link_libraries(main ${OpenCV_LIBS})
 #     COMMENT "Running the target image with directory path"
 # )
 
-# Passing the argument to run the third task
+# Passing the argument to run the fourth task
 add_custom_command(TARGET main POST_BUILD
-    COMMAND main ${CMAKE_SOURCE_DIR}/olympus/test/pic.0009.jpg ${CMAKE_SOURCE_DIR}/olympus/test multiHistogram histogramIntersection 3
+    COMMAND main ${CMAKE_SOURCE_DIR}/olympus/test/pic.0009.jpg ${CMAKE_SOURCE_DIR}/olympus/test colorTexture histogramIntersection 3
     COMMENT "Running the target image with directory path"
 )
 
