@@ -7,5 +7,6 @@ using namespace cv;
 using namespace std;
 
 double sumOfSquaredDifference(cv::Mat &targetImage, cv::Mat &image);
+double histogramIntersection(const cv::Mat &targetImage, const cv::Mat &image);
 
 #endif // DISTANCEMETRIC_H

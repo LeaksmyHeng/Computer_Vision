@@ -40,7 +40,7 @@ cv::Mat baselineMatching(const cv::Mat &image) {
 }
 
 
-cv::Mat histogram(const cv::Mat &image, int numberOfBins = 8) {
+cv::Mat histogram(const cv::Mat &image, int numberOfBins) {
     /**
     * Convert image to histogram.
     */
@@ -51,7 +51,7 @@ cv::Mat histogram(const cv::Mat &image, int numberOfBins = 8) {
     // since know number of bins, now we calculate the range of pixel in 
     // each of the bins, which in this case is 32 (256 is max so divide by 8 bins)
     // therefore, we know bins 1: 0-36, bin2: 36-68, ... for each R,G,B
-    int range = 256 / 8;
+    int range = 256 / numberOfBins;
 
     // we need to count the pixel in each bins
     // first create the mat (matrix) to store the histogram
@@ -76,4 +76,3 @@ cv::Mat histogram(const cv::Mat &image, int numberOfBins = 8) {
     // Return the histogram
     return feature;
   }
-  

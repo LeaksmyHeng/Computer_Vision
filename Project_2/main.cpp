@@ -40,6 +40,8 @@ int main(int argc, char *argv[]) {
         printf("Image file path: %s\n", argv[1]);
         return 1;
     }
+
+    /****************** Feature *******************/
     cv::Mat targetImageFeature;
     if (featureComputingMethod == "baseline") {
         targetImageFeature = baselineMatching(target_image);
@@ -82,26 +84,34 @@ int main(int argc, char *argv[]) {
                     continue;
                 }
 
+                /****************** Features *******************/
                 // Compute features for the current image in the database
                 cv::Mat computingFeaturesImage;
                 if (featureComputingMethod == "baseline") {
                     computingFeaturesImage = baselineMatching(image);
                 }
                 else if (featureComputingMethod == "histogram") {
-                    computingFeaturesImage = histogram(target_image);
+                    computingFeaturesImage = histogram(image);
                 }
 
+                /****************** Distance Metric *******************/
                 // Compute the SSD distance with the target image features
                 double result = 0.0;
                 if (distanceMetric == "SSD") {
                     result = sumOfSquaredDifference(computingFeaturesImage, targetImageFeature);
-                    // if result is 0 that means we are computing the same image. so skip
-                    if (result == 0.0) {
-                        std::cout << "Found target image in database: " << filename << std::endl;
-                        continue;
-                    }
-                    resultDict[filename.c_str()] = result;
                 }
+                if (distanceMetric == "histogramIntersection") {
+                    printf("Histogram\n");
+                    result = histogramIntersection(computingFeaturesImage, targetImageFeature);
+                }
+
+                // if result is 0 that means we are computing the same image. so skip
+                if (result == 0.0) {
+                    std::cout << "Found target image in database: " << filename << std::endl;
+                    continue;
+                }
+                // write the filename and its distance to the map
+                resultDict[filename.c_str()] = result;
             }
         }
     }
@@ -127,7 +137,6 @@ int main(int argc, char *argv[]) {
     }
 
     printf("Done looping through file");
-
 
     return 0;
 }

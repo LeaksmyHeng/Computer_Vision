@@ -47,3 +47,24 @@ double sumOfSquaredDifference(cv::Mat &targetImage, cv::Mat &image) {
     // printf("Sum of square result is %f\n", result);
     return result;
 }
+
+double histogramIntersection(const cv::Mat &targetImage, const cv::Mat &image) {
+    /*
+     * Function to calculate histogramIntersection between 2 images
+     * Histogram intersection = 1 - sum of min(xi, yi)
+     */
+    
+    double result = 0.0;
+    // printf("Before looping in histogram intersection\n");
+    for (int b = 0; b < targetImage.size[0]; ++b) {
+        for (int g = 0; g < targetImage.size[1]; ++g) {
+            for (int r = 0; r < targetImage.size[2]; ++r) {
+                // Add the minimum value between corresponding bins from both histograms
+                result += std::min(targetImage.at<float>(b, g, r), image.at<float>(b, g, r));
+            }
+        }
+    }
+
+    // printf("Histogram result is %f\n", result);
+    return result;
+}
