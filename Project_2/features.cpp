@@ -10,7 +10,7 @@ using namespace cv;
 using namespace std;
 
 
-cv::Mat baselineMatching(const cv::Mat& image) {
+cv::Mat baselineMatching(const cv::Mat &image) {
     /**
      * Use the 7x7 square in the middle of the image as a feature vector.
      * 
@@ -38,3 +38,42 @@ cv::Mat baselineMatching(const cv::Mat& image) {
     // cv::waitKey(0);
     return image(rect).clone();
 }
+
+
+cv::Mat histogram(const cv::Mat &image, int numberOfBins = 8) {
+    /**
+    * Convert image to histogram.
+    */
+
+    // initalized a 3D histogram with a specify number of bins for each color
+    int histogramSize[] = {numberOfBins, numberOfBins, numberOfBins};
+
+    // since know number of bins, now we calculate the range of pixel in 
+    // each of the bins, which in this case is 32 (256 is max so divide by 8 bins)
+    // therefore, we know bins 1: 0-36, bin2: 36-68, ... for each R,G,B
+    int range = 256 / 8;
+
+    // we need to count the pixel in each bins
+    // first create the mat (matrix) to store the histogram
+    // initiaze all value to 0
+    cv::Mat feature = Mat::zeros(3, histogramSize, CV_32F);
+
+    for (int y = 0; y < image.rows; ++y) {
+        for (int x = 0; x < image.cols; ++x) {
+            cv::Vec3b imageColor = image.at<cv::Vec3b>(y, x);
+            int blue = imageColor[0] / range;
+            int green = imageColor[1] / range;
+            int red = imageColor[2] / range;
+
+            // increment the count of how many pixels fall into the bin corresponding to (b, g, r)
+            feature.at<float>(blue, green, red)++;
+        }
+    }
+
+    // Normalize the histogram using L2 normalization so that the sum of squared values equals 1
+    normalize(feature, feature, 1, 0, cv::NORM_L2, -1, cv::Mat());
+
+    // Return the histogram
+    return feature;
+  }
+  

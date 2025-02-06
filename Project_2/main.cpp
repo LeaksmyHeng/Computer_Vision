@@ -22,9 +22,9 @@ bool compareFileNameAndItsDistanceValue(const std::pair<std::string, double>& a,
 
 int main(int argc, char *argv[]) {
 
-    // // there are 5 arguments
+    // there are 5 arguments
     // if (argc < 5) {
-    //     printf("Error: At least 5 arguments are required.");
+    //     printf("Error: At least 5 arguments are required. %d were found\n", argc);
     //     return -1;
     // }
 
@@ -43,6 +43,9 @@ int main(int argc, char *argv[]) {
     cv::Mat targetImageFeature;
     if (featureComputingMethod == "baseline") {
         targetImageFeature = baselineMatching(target_image);
+    }
+    else if (featureComputingMethod == "histogram") {
+        targetImageFeature = histogram(target_image);
     }
 
     // checking if imageDatabase exist (for argv[2])
@@ -83,6 +86,9 @@ int main(int argc, char *argv[]) {
                 cv::Mat computingFeaturesImage;
                 if (featureComputingMethod == "baseline") {
                     computingFeaturesImage = baselineMatching(image);
+                }
+                else if (featureComputingMethod == "histogram") {
+                    computingFeaturesImage = histogram(target_image);
                 }
 
                 // Compute the SSD distance with the target image features

@@ -23,7 +23,7 @@ target_link_libraries(main ${OpenCV_LIBS})
 
 # Passing the argument to run the second task
 add_custom_command(TARGET main POST_BUILD
-    COMMAND main ${CMAKE_SOURCE_DIR}/olympus/test/pic.0009.jpg ${CMAKE_SOURCE_DIR}/olympus/test baseline SSD 5
+    COMMAND main ${CMAKE_SOURCE_DIR}/olympus/test/pic.0009.jpg ${CMAKE_SOURCE_DIR}/olympus/test histogram histogramIntersection 5
     COMMENT "Running the target image with directory path"
 )
 
