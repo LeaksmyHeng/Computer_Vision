@@ -10,6 +10,18 @@ using namespace cv;
 using namespace std;
 
 
+bool checkingEmptyImage(const cv::Mat &image) {
+	/**
+	 * Function to check if image is empty.
+	 * If it is empty, return true otherwise false
+	 */
+	if (image.empty()) {
+        printf("Empty image\n");
+        return true;
+    }
+	return false;
+}
+
 cv::Mat baselineMatching(const cv::Mat &image) {
     /**
      * Use the 7x7 square in the middle of the image as a feature vector.
@@ -18,11 +30,16 @@ cv::Mat baselineMatching(const cv::Mat &image) {
      * 
      * return: img of the 7x7
      */
+
+	if (checkingEmptyImage(image)) {
+		return cv::Mat();
+	}
     
     // check if image size is smaller than 7.
     // if it is throw error
     if (image.cols < 7 || image.rows < 7) {
-        throw std::out_of_range("Image is too small for a 7x7 region.");
+		printf("Image too small for 7x7 region.\n")
+		return cv::Mat();
     }
 
     // get the top left corner of the image with 7*7
@@ -44,6 +61,9 @@ cv::Mat histogram(const cv::Mat &image, int numberOfBins) {
     /**
     * Convert image to histogram.
     */
+    if (checkingEmptyImage(image)) {
+		return cv::Mat();
+	}
 
     // initalized a 3D histogram with a specify number of bins for each color
     int histogramSize[] = {numberOfBins, numberOfBins, numberOfBins};
@@ -77,3 +97,50 @@ cv::Mat histogram(const cv::Mat &image, int numberOfBins) {
     // Return the histogram
     return feature;
   }
+
+
+cv::Mat multiHistogram(const cv::Mat &image, int numberOfBins = 8) {
+	/**
+	 * Function to create multi histogram.
+	 */
+    // Ensure the image is not empty
+    if (checkingEmptyImage(image)) {
+		return cv::Mat();
+	}
+
+    // Get the dimensions of the image
+    int height = image.rows;
+    int width = image.cols;
+
+    // Get the top half and bottom half of the region
+	// rect is x, y, width and height.
+    cv::Rect topRegion(0, 0, width, height / 2);  				// Top
+    cv::Rect bottomRegion(0, height / 2, width, height / 2); 	// Bottom
+
+    // Extract the top and bottom halves of the image
+    cv::Mat topHalf = image(topRegion);
+    cv::Mat bottomHalf = image(bottomRegion);
+
+    // Compute the histograms for the top and bottom halves
+	// using the RGB histogram from above function
+    cv::Mat histTop = histogram(topHalf, numberOfBins);
+    cv::Mat histBottom = histogram(bottomHalf, numberOfBins);
+
+    // Check if histograms are empty
+    if (histTop.empty() || histBottom.empty()) {
+        printf("Either top histogram or bottom histogram is empty.\n")
+        return cv::Mat();
+    }
+
+    // Concatenate the histograms (top and bottom halves) horizontally
+	// printf("trying to concatenated hist.\n");
+    cv::Mat concatenatedHist;
+    cv::hconcat(histTop, histBottom, concatenatedHist);
+
+    // Normalize the concatenated histogram (to range [0, 1])
+	// using L1 because i want the pixel to be divided by overall pixel
+    cv::normalize(concatenatedHist, concatenatedHist, 0, 1, cv::NORM_L1, -1, cv::Mat());
+
+    // Return the concatenated histogram as a cv::Mat
+    return concatenatedHist;
+}

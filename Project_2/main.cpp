@@ -50,6 +50,9 @@ int main(int argc, char *argv[]) {
     else if (featureComputingMethod == "histogram") {
         targetImageFeature = histogram(target_image);
     }
+    else if (featureComputingMethod == "multiHistogram") {
+        targetImageFeature = histogram(target_image);
+    }
 
     // checking if imageDatabase exist (for argv[2])
     if (!fs::exists(imageDatabase) || !fs::is_directory(imageDatabase)) {
@@ -92,6 +95,9 @@ int main(int argc, char *argv[]) {
                     computingFeaturesImage = baselineMatching(image);
                 }
                 else if (featureComputingMethod == "histogram") {
+                    computingFeaturesImage = histogram(image);
+                }
+                else if (featureComputingMethod == "multiHistogram") {
                     computingFeaturesImage = histogram(image);
                 }
 

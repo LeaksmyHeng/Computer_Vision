@@ -21,15 +21,27 @@ target_link_libraries(main ${OpenCV_LIBS})
 #     COMMENT "Running the target image with directory path"
 # )
 
-# Passing the argument to run the second task
+# # Passing the argument to run the second task
+# add_custom_command(TARGET main POST_BUILD
+#     COMMAND main ${CMAKE_SOURCE_DIR}/olympus/olympus/pic.0164.jpg ${CMAKE_SOURCE_DIR}/olympus/olympus histogram histogramIntersection 5
+#     COMMENT "Running the target image with directory path"
+# )
+
+# # Passing the argument to run the third task
+# add_custom_command(TARGET main POST_BUILD
+#     COMMAND main ${CMAKE_SOURCE_DIR}/olympus/olympus/pic.0274.jpg ${CMAKE_SOURCE_DIR}/olympus/olympus multiHistogram histogramIntersection 5
+#     COMMENT "Running the target image with directory path"
+# )
+
+# Passing the argument to run the third task
 add_custom_command(TARGET main POST_BUILD
-    COMMAND main ${CMAKE_SOURCE_DIR}/olympus/olympus/pic.0164.jpg ${CMAKE_SOURCE_DIR}/olympus/olympus histogram histogramIntersection 5
+    COMMAND main ${CMAKE_SOURCE_DIR}/olympus/test/pic.0009.jpg ${CMAKE_SOURCE_DIR}/olympus/test multiHistogram histogramIntersection 3
     COMMENT "Running the target image with directory path"
 )
 
-# # Passing the argument to run the second task
+# Passing the argument to run the second task
 # add_custom_command(TARGET main POST_BUILD
-#     COMMAND main ${CMAKE_SOURCE_DIR}/olympus/test/pic.0009.jpg ${CMAKE_SOURCE_DIR}/olympus/test histogram histogramIntersection 5
+#     COMMAND main ${CMAKE_SOURCE_DIR}/olympus/olympus/pic.0164.jpg ${CMAKE_SOURCE_DIR}/olympus/olympus histogram histogramIntersection 5
 #     COMMENT "Running the target image with directory path"
 # )
 
