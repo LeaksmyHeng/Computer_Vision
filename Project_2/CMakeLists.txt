@@ -15,9 +15,15 @@ enable_testing()
 add_executable(main main.cpp features.cpp distance_metric.cpp)
 target_link_libraries(main ${OpenCV_LIBS})
 
-# Passing the argument to run the timeBlue.cpp
+# # Passing the argument to run the first task
+# add_custom_command(TARGET main POST_BUILD
+#     COMMAND main ${CMAKE_SOURCE_DIR}/olympus/olympus/pic.1016.jpg ${CMAKE_SOURCE_DIR}/olympus/olympus baseline SSD 5
+#     COMMENT "Running the target image with directory path"
+# )
+
+# Passing the argument to run the second task
 add_custom_command(TARGET main POST_BUILD
-    COMMAND main ${CMAKE_SOURCE_DIR}/olympus/test/pic.0009.jpg ${CMAKE_SOURCE_DIR}/olympus/test baseline SSD
+    COMMAND main ${CMAKE_SOURCE_DIR}/olympus/test/pic.0009.jpg ${CMAKE_SOURCE_DIR}/olympus/test baseline SSD 5
     COMMENT "Running the target image with directory path"
 )
 

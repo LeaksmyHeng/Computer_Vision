@@ -10,6 +10,16 @@ using namespace cv;
 using namespace std;
 namespace fs = std::filesystem;
 
+bool compareFileNameAndItsDistanceValue(const std::pair<std::string, double>& a, const std::pair<std::string, double>& b) {
+    /***
+     * Comparing the distance value by their key value pair.
+     * 
+     * :param a: the first map used for compmaring to b
+     * :param b: the second map used for comparing to a
+     */
+    return a.second < b.second;
+}
+
 int main(int argc, char *argv[]) {
 
     // // there are 5 arguments
@@ -22,8 +32,7 @@ int main(int argc, char *argv[]) {
     fs::path imageDatabase = argv[2];
     std::string featureComputingMethod = argv[3];
     std::string distanceMetric = argv[4];
-
-    // std::int outPutImage[256] = argv[5];
+    int outPutImage = std::stoi(argv[5]);
 
     // checking if target image exist (for argv[1])
     cv::Mat target_image = cv::imread(targetImage);
@@ -43,6 +52,7 @@ int main(int argc, char *argv[]) {
     }
 
     // initialized the dictonary result that store file name and the distance metric result
+    // use map as I want to store it as key value pair
     // this will be sorted and display the image with the closest match
     // https://www.geeksforgeeks.org/how-to-create-a-dictionary-in-cpp/
     map<std::string, double> resultDict;
@@ -52,6 +62,13 @@ int main(int argc, char *argv[]) {
     for (const auto& entry : fs::directory_iterator(imageDatabase)) {
         if (entry.is_regular_file()) {
             std::string filename = entry.path().string();
+
+            // check if filename is the same as target then continue
+            if (filename == targetImage) {
+                std::cout << "Found target image in database: " << filename << std::endl;
+                continue;
+            }
+
             if (filename.ends_with(".jpg") || filename.ends_with(".png") ||
                 filename.ends_with(".ppm") || filename.ends_with(".tif")) {
 
@@ -72,6 +89,11 @@ int main(int argc, char *argv[]) {
                 double result = 0.0;
                 if (distanceMetric == "SSD") {
                     result = sumOfSquaredDifference(computingFeaturesImage, targetImageFeature);
+                    // if result is 0 that means we are computing the same image. so skip
+                    if (result == 0.0) {
+                        std::cout << "Found target image in database: " << filename << std::endl;
+                        continue;
+                    }
                     resultDict[filename.c_str()] = result;
                 }
             }
@@ -79,8 +101,24 @@ int main(int argc, char *argv[]) {
     }
 
     
-    for (auto it : resultDict)
-        cout << it.first << ": " << it.second << endl;
+    // sorted the resultDict in ascending order of its value (distance metric result)
+    // by: convert map to a vector pair
+    std::vector<std::pair<std::string, double>> resultVector(resultDict.begin(), resultDict.end());
+    std::sort(resultVector.begin(), resultVector.end(), compareFileNameAndItsDistanceValue);
+
+    std::cout << "Top "<< outPutImage <<" images sorted by "<< distanceMetric <<" values (ascending):" << std::endl;
+    for (int i = 0; i < outPutImage && i < resultVector.size(); i++) {
+        // .first is key and .second is value
+        string imagePath = resultVector[i].first;
+        Mat img = imread(imagePath);
+
+        if (!img.empty()) {
+            cout << "Displaying image: " << imagePath << " with SSD: " << resultVector[i].second << endl;
+            // Show the image using OpenCV
+            imshow("Top " + to_string(i + 1) + " Image", img);
+            waitKey(0);
+        }
+    }
 
     printf("Done looping through file");
 
