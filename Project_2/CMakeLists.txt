@@ -55,16 +55,16 @@ target_link_libraries(main ${OpenCV_LIBS})
 #     COMMAND main ${CMAKE_SOURCE_DIR}/olympus/olympus/pic.1072.jpg ${CMAKE_SOURCE_DIR}/olympus/olympus baseline SSD 3
 #     COMMENT "Running the target image with directory path"
 # )
-# Compare with baseline method using histogram histogram intersection
-add_custom_command(TARGET main POST_BUILD
-    COMMAND main ${CMAKE_SOURCE_DIR}/olympus/olympus/pic.0734.jpg ${CMAKE_SOURCE_DIR}/olympus/olympus histogram histogramIntersection 3
-    COMMENT "Running the target image with directory path"
-)
-
-# Passing the argument to run the second task
+# # Compare with baseline method using histogram histogram intersection
 # add_custom_command(TARGET main POST_BUILD
-#     COMMAND main ${CMAKE_SOURCE_DIR}/olympus/olympus/pic.0164.jpg ${CMAKE_SOURCE_DIR}/olympus/olympus histogram histogramIntersection 5
+#     COMMAND main ${CMAKE_SOURCE_DIR}/olympus/olympus/pic.0734.jpg ${CMAKE_SOURCE_DIR}/olympus/olympus histogram histogramIntersection 3
 #     COMMENT "Running the target image with directory path"
 # )
+
+# Passing the argument to run the last task 0280 & the 0343
+add_custom_command(TARGET main POST_BUILD
+    COMMAND main ${CMAKE_SOURCE_DIR}/olympus/olympus/pic.0280.jpg ${CMAKE_SOURCE_DIR}/olympus/olympus CBIR CBIR 5
+    COMMENT "Running the target image with directory path"
+)
 
 include(CPack)

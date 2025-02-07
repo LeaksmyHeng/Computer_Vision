@@ -11,5 +11,6 @@ double histogramIntersection(const cv::Mat &targetImage, const cv::Mat &image);
 double chiSquareDistance(const cv::Mat& targetImage, const cv::Mat& image);
 double weightedDistance(const cv::Mat& colorHistogram1, const cv::Mat& textureHistogram1, const cv::Mat& colorHistogram2, const cv::Mat& textureHistogram2);
 double sumOfSquaredDifferenceVector(const vector<float>& targetImage, const vector<float>& image);
+double cosineDistance(const vector<float>& targetImage, const vector<float>& image);
 
 #endif // DISTANCEMETRIC_H

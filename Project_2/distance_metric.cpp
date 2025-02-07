@@ -113,6 +113,15 @@ double sumOfSquaredDifferenceVector(const vector<float>& targetImage, const vect
         result += diff * diff;
     }
     return result;
+}
 
+double cosineDistance(const vector<float>& targetImage, const vector<float>& image) {
+    double dotProduct = 0.0, norm1 = 0.0, norm2 = 0.0;
+    for (size_t i = 0; i < targetImage.size(); i++) {
+        dotProduct += targetImage[i] * image[i];
+        norm1 += targetImage[i] * targetImage[i];
+        norm2 += image[i] * image[i];
+    }
+    return 1.0 - (dotProduct / (sqrt(norm1) * sqrt(norm2)));
 }
 

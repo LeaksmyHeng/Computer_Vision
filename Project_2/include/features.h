@@ -11,5 +11,6 @@ cv::Mat histogram(const cv::Mat& image, int numberOfBins = 8, bool is1D = false)
 cv::Mat multiHistograms(const cv::Mat &image, int numberOfBins = 8);
 cv::Mat texture(const cv::Mat& image);
 cv::Mat colorTexture(const cv::Mat &image, int numberOfBins);
+vector<float> extractColorFeatures(const string& image);
 
 #endif // FEATURES_H

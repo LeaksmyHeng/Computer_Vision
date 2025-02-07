@@ -67,6 +67,8 @@ int main(int argc, char *argv[]) {
     cv::Mat targetColorFeature;
     cv::Mat targetTextureFeature;
     std::string targetImageName;
+    vector<float> targetColorExtraction;
+
     if (featureComputingMethod == "baseline") {
         targetImageFeature = baselineMatching(target_image);
     }
@@ -82,6 +84,10 @@ int main(int argc, char *argv[]) {
     }
     else if (featureComputingMethod == "DNN") {
         targetImageName = getFileName(targetImage.c_str());
+    }
+    else if (featureComputingMethod == "CBIR") {
+        targetImageName = getFileName(targetImage.c_str());
+        targetColorExtraction = extractColorFeatures(targetImage);
     }
 
     // checking if imageDatabase exist (for argv[2])
@@ -163,6 +169,22 @@ int main(int argc, char *argv[]) {
                         return -1;
                     }
                     result = sumOfSquaredDifferenceVector(targetImageFound->second, featureImageFound->second);
+                }
+                if (distanceMetric == "CBIR") {
+                    vector<float> imageColorFeature = extractColorFeatures(filename);
+                    std::string imageName = getFileName(filename.c_str());
+                    // calculating distance using cosineDistance and SSD
+                    auto targetImageFound = dataMap.find(targetImageName);
+                    auto featureImageFound = dataMap.find(imageName);
+                    if (targetImageFound == dataMap.end() || featureImageFound == dataMap.end()) {
+                        printf("Error while trying to find targetimage or featureimage\n");
+                        return -1;
+                    }
+                    double cosine = cosineDistance(targetImageFound->second, featureImageFound->second);
+                    double ssd = sumOfSquaredDifferenceVector(targetColorExtraction, imageColorFeature);
+                    // result = 0.5 * cosine + 0.5 * ssd;
+                    // result = 0.75 * cosine + 0.25 * ssd;
+                    result = 0.25 * cosine + 0.75 * ssd;
                 }
 
                 // if result is 0 that means we are computing the same image. so skip

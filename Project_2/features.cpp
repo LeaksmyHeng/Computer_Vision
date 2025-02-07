@@ -5,6 +5,7 @@
 
 #include <math.h>
 #include <vector>
+#include <filesystem>
 #include <opencv2/opencv.hpp>
 
 using namespace cv;
@@ -226,16 +227,6 @@ vector<float> extractColorFeatures(const string& image) {
     cv::Scalar meanHSV = cv::mean(hsv);
     return { static_cast<float>(meanRGB[2]), static_cast<float>(meanRGB[1]), static_cast<float>(meanRGB[0]), static_cast<float>(meanHSV[0]) };
 }
-
-// void cbirSearchFunction(const string& image, unordered_map<string, vector<float>>& features) {
-//     vector<float> queryColor = extractColorFeatures(image);
-//     // since image has its full image path
-//     // we will use 
-//     if (dnnFeatures.find(queryFile) == dnnFeatures.end()) {
-//         cerr << "Query image not found in dataset!" << endl;
-//         return;
-//     }
-// }
 
 cv::Mat reshapeTo2D(cv::Mat& mat) {
     if (mat.dims == 3) {
