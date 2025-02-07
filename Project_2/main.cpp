@@ -41,6 +41,8 @@ int main(int argc, char *argv[]) {
 
     /****************** Feature *******************/
     cv::Mat targetImageFeature;
+    cv::Mat targetColorFeature;
+    cv::Mat targetTextureFeature;
     if (featureComputingMethod == "baseline") {
         targetImageFeature = baselineMatching(target_image);
     }
@@ -51,7 +53,8 @@ int main(int argc, char *argv[]) {
         targetImageFeature = histogram(target_image);
     }
     else if (featureComputingMethod == "colorTexture") {
-        targetImageFeature = colorTexture(target_image, 8);
+        targetColorFeature = histogram(target_image, 8, true);
+        targetTextureFeature = texture(target_image);
     }
 
     // checking if imageDatabase exist (for argv[2])
@@ -91,6 +94,8 @@ int main(int argc, char *argv[]) {
                 /****************** Features *******************/
                 // Compute features for the current image in the database
                 cv::Mat computingFeaturesImage;
+                cv::Mat colorFeatureImage;
+                cv::Mat textureFeatureImage;
                 if (featureComputingMethod == "baseline") {
                     computingFeaturesImage = baselineMatching(image);
                 }
@@ -101,7 +106,9 @@ int main(int argc, char *argv[]) {
                     computingFeaturesImage = histogram(image);
                 }
                 else if (featureComputingMethod == "colorTexture") {
-                    computingFeaturesImage = colorTexture(image, 8);
+                    // computingFeaturesImage = colorTexture(image, 8);
+                    colorFeatureImage = histogram(image, 8, true);
+                    textureFeatureImage = texture(image);
                 }
 
                 /****************** Distance Metric *******************/
@@ -112,6 +119,9 @@ int main(int argc, char *argv[]) {
                 }
                 if (distanceMetric == "histogramIntersection") {
                     result = histogramIntersection(targetImageFeature, computingFeaturesImage);
+                }
+                if (distanceMetric == "weightedDistance") {
+                    result = weightedDistance(colorFeatureImage, targetImageFeature, targetColorFeature, targetTextureFeature);
                 }
 
                 // if result is 0 that means we are computing the same image. so skip

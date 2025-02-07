@@ -11,7 +11,7 @@
 using namespace cv;
 using namespace std;
 
-double sumOfSquaredDifference(cv::Mat &targetImage, cv::Mat &image) {
+double sumOfSquaredDifference(const cv::Mat &targetImage, const cv::Mat &image) {
     /**
      * Function to calculate sum of squared different between two images.
      * Formula SSD = sum of ( (R1 - R2)^2 + (G1 - G2)^2 + (B1 - B2)^2)
@@ -67,4 +67,38 @@ double histogramIntersection(const cv::Mat &targetImage, const cv::Mat &image) {
 
     // printf("Histogram result is %f\n", result);
     return 1 - result;
+}
+
+double chiSquareDistance(const cv::Mat& targetImage, const cv::Mat& image) {
+    /**
+     * Funtion to calculate chiSquareDistance between two histogram.
+     * This is used in ColorTexture feature
+     * 
+     * Σ ((a_i - b_i)^2 / (a_i + b_i))
+     * https://www.geeksforgeeks.org/chi-square-distance-in-python/ 
+     */
+    double result = 0.0;
+    for (int i = 0; i < targetImage.cols; i++) {
+        float a = targetImage.at<float>(0, i);
+        float b = image.at<float>(0, i);
+        if (a + b != 0) {
+            result += ((a - b) * (a - b)) / (a + b);
+        }
+    }
+    return result / 2.0;
+}
+
+double weightedDistance(const cv::Mat& colorHistogram1, const cv::Mat& textureHistogram1, const cv::Mat& colorHistogram2, const cv::Mat& textureHistogram2) {
+    /**
+     * Since in ColorTexture, we have both Color histogram and texture histogram
+     * I used weighted distance for that where each histogram is 0.5
+     **/
+
+    double result = 0.0;
+    double colorDistance = chiSquareDistance(colorHistogram1, colorHistogram2);
+    double textureDistance = chiSquareDistance(textureHistogram1, textureHistogram2);
+    result = 0.5 * colorDistance + 0.5 * textureDistance;
+    
+    return result;
+
 }

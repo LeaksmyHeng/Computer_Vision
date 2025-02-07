@@ -6,7 +6,9 @@
 using namespace cv;
 using namespace std;
 
-double sumOfSquaredDifference(cv::Mat &targetImage, cv::Mat &image);
+double sumOfSquaredDifference(const cv::Mat &targetImage, const cv::Mat &image);
 double histogramIntersection(const cv::Mat &targetImage, const cv::Mat &image);
+double chiSquareDistance(const cv::Mat& targetImage, const cv::Mat& image);
+double weightedDistance(const cv::Mat& colorHistogram1, const cv::Mat& textureHistogram1, const cv::Mat& colorHistogram2, const cv::Mat& textureHistogram2);
 
 #endif // DISTANCEMETRIC_H

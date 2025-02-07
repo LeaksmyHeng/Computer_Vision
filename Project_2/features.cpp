@@ -4,6 +4,7 @@
 */
 
 #include <math.h>
+#include <vector>
 #include <opencv2/opencv.hpp>
 
 using namespace cv;
@@ -57,7 +58,7 @@ cv::Mat baselineMatching(const cv::Mat &image) {
 }
 
 
-cv::Mat histogram(const cv::Mat &image, int numberOfBins) {
+cv::Mat histogram(const cv::Mat &image, int numberOfBins, bool is1D) {
     /**
     * Convert image to histogram.
     */
@@ -94,6 +95,11 @@ cv::Mat histogram(const cv::Mat &image, int numberOfBins) {
     // achieving this by dividing it with total pixel
     normalize(feature, feature, 1, 0, cv::NORM_L1, -1, cv::Mat());
 
+    // if 1D is true, convert this to 1D
+    if (is1D) {
+        return cv::Mat(feature).reshape(1, 1);
+    }
+
     // Return the histogram
     return feature;
   }
@@ -123,8 +129,8 @@ cv::Mat multiHistogram(const cv::Mat &image, int numberOfBins = 8) {
 
     // Compute the histograms for the top and bottom halves
 	// using the RGB histogram from above function
-    cv::Mat histTop = histogram(topHalf, numberOfBins);
-    cv::Mat histBottom = histogram(bottomHalf, numberOfBins);
+    cv::Mat histTop = histogram(topHalf, numberOfBins, false);
+    cv::Mat histBottom = histogram(bottomHalf, numberOfBins, false);
 
     // Check if histograms are empty
     if (histTop.empty() || histBottom.empty()) {
@@ -187,11 +193,11 @@ cv::Mat texture(const cv::Mat& image) {
 	// calculate binsize
 	float binSize = (rangeEnd - rangeStart) / histSize;
 
+    // loop through each row and cols of the gradient magnitude
 	for (int i=0; i<gradientMagnitude.rows; i++) {
 		for (int j=0; j<gradientMagnitude.cols; j++) {
 			// get mag value at pixel i & j
 			float gradientValue = gradientMagnitude.at<float>(i, j);
-
 			// check if gradient is within range
 			if (gradientValue >= rangeStart && gradientValue < rangeEnd) {
                 // Calculate the corresponding bin index
@@ -211,26 +217,59 @@ cv::Mat texture(const cv::Mat& image) {
 }
 
 
+cv::Mat reshapeTo2D(cv::Mat& mat) {
+    if (mat.dims == 3) {
+        // Reshape 3D mat into 2D (1 row, total cols = channels * bins)
+        int newCols = mat.size[1] * mat.size[2]; // Multiply size[1] and size[2] to flatten channels
+        mat = mat.reshape(1, 1);  // Reshape to 1 row, multiple columns
+    }
+    return mat;
+}
+
+std::vector<float> matToVector(cv::Mat& mat) {
+    /**
+     * Convert cv::mat to vector 1D vector so we could concatenate it with the
+     * colorTexture histogram which was in  1D
+     */
+    // Check if matrix is 3D and reshape it to 2D
+    if (mat.dims == 3) {
+        mat = reshapeTo2D(mat);
+    }
+
+    // Mat should be 2D, flatten it to 1D vector
+    std::vector<float> vec;
+    mat.reshape(1, 1).copyTo(vec);
+    return vec;
+}
+
+
+
 cv::Mat colorTexture(const cv::Mat& image, int numberOfBins = 8) {
-	/***
-	 * Combine the histogram with texture.
-	 */
+    /***
+     * Function to merge histogram and texture to ColorText.
+     * ColorHistogram is in 3D; therefore, need to convert it to 1D
+     */
+    // Compute histograms
+    cv::Mat colorHistogram = histogram(image, numberOfBins, false);
+    cv::Mat textureHistogram = texture(image);
 
-	cv::Mat colorHistogram = histogram(image, numberOfBins);
-	cv::Mat textureHistogram = texture(image);
+    // Ensure matrices are CV_32F for consistency
+    colorHistogram.convertTo(colorHistogram, CV_32F);
+    textureHistogram.convertTo(textureHistogram, CV_32F);
 
-	// // combine both color and texture histogram
-	// std::vector<cv::Mat> histograms;
-    // histograms.push_back(colorHistogram);
-    // histograms.push_back(textureHistogram);
+    // Convert both histograms to vectors if they are 2D (or reshaped to 2D)
+    std::vector<float> colorVec;
+    std::vector<float> textureVec;
 
-	// cv::Mat combinedHist;
-    // cv::hconcat(histograms, combinedHist);
+    colorVec = matToVector(colorHistogram);
+    textureVec = matToVector(textureHistogram);
 
-	// cv::normalize(combinedHist, combinedHist, 1, 0, cv::NORM_L1);
-	// return combinedHist;
-	cv::Mat concatenatedHist;
-    cv::hconcat(colorHistogram, textureHistogram, concatenatedHist);
-	cv::normalize(concatenatedHist, concatenatedHist, 0, 1, cv::NORM_L1, -1, cv::Mat());
-	return concatenatedHist;
+    // Concatenate vectors
+    std::vector<float> combinedVec;
+    combinedVec.reserve(colorVec.size() + textureVec.size());
+    combinedVec.insert(combinedVec.end(), colorVec.begin(), colorVec.end());
+    combinedVec.insert(combinedVec.end(), textureVec.begin(), textureVec.end());
+
+    // Convert back to cv::Mat (1 row, N columns)
+    return cv::Mat(combinedVec).reshape(1, 1);
 }
