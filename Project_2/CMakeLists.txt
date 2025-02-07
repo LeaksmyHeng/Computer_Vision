@@ -12,7 +12,7 @@ set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
 include(CTest)
 enable_testing()
 
-add_executable(main main.cpp features.cpp distance_metric.cpp)
+add_executable(main main.cpp features.cpp distance_metric.cpp csv_util.cpp)
 target_link_libraries(main ${OpenCV_LIBS})
 
 # # Passing the argument to run the first task
@@ -33,16 +33,33 @@ target_link_libraries(main ${OpenCV_LIBS})
 #     COMMENT "Running the target image with directory path"
 # )
 
-# Passing the argument to run the fourth task
-add_custom_command(TARGET main POST_BUILD
-    COMMAND main ${CMAKE_SOURCE_DIR}/olympus/olympus/pic.0535.jpg ${CMAKE_SOURCE_DIR}/olympus/olympus colorTexture weightedDistance 5
-    COMMENT "Running the target image with directory path"
-)
-
+# # Passing the argument to run the fourth task
 # add_custom_command(TARGET main POST_BUILD
-#     COMMAND main ${CMAKE_SOURCE_DIR}/olympus/test/pic.0009.jpg ${CMAKE_SOURCE_DIR}/olympus/test colorTexture weightedDistance 5
+#     COMMAND main ${CMAKE_SOURCE_DIR}/olympus/olympus/pic.0535.jpg ${CMAKE_SOURCE_DIR}/olympus/olympus colorTexture weightedDistance 5
 #     COMMENT "Running the target image with directory path"
 # )
+
+# # Passing the argument to run the fifth task
+# add_custom_command(TARGET main POST_BUILD
+#     COMMAND main ${CMAKE_SOURCE_DIR}/olympus/olympus/pic.0734.jpg ${CMAKE_SOURCE_DIR}/olympus/olympus DNN SSD_V 3
+#     COMMENT "Running the target image with directory path"
+# )
+
+# # Passing the argument to run the sixth task
+# add_custom_command(TARGET main POST_BUILD
+#     COMMAND main ${CMAKE_SOURCE_DIR}/olympus/olympus/pic.0734.jpg ${CMAKE_SOURCE_DIR}/olympus/olympus DNN SSD_V 3
+#     COMMENT "Running the target image with directory path"
+# )
+# # Compare with baseline method using SSD
+# add_custom_command(TARGET main POST_BUILD
+#     COMMAND main ${CMAKE_SOURCE_DIR}/olympus/olympus/pic.1072.jpg ${CMAKE_SOURCE_DIR}/olympus/olympus baseline SSD 3
+#     COMMENT "Running the target image with directory path"
+# )
+# Compare with baseline method using histogram histogram intersection
+add_custom_command(TARGET main POST_BUILD
+    COMMAND main ${CMAKE_SOURCE_DIR}/olympus/olympus/pic.0734.jpg ${CMAKE_SOURCE_DIR}/olympus/olympus histogram histogramIntersection 3
+    COMMENT "Running the target image with directory path"
+)
 
 # Passing the argument to run the second task
 # add_custom_command(TARGET main POST_BUILD

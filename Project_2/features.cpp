@@ -57,7 +57,6 @@ cv::Mat baselineMatching(const cv::Mat &image) {
     return image(rect).clone();
 }
 
-
 cv::Mat histogram(const cv::Mat &image, int numberOfBins, bool is1D) {
     /**
     * Convert image to histogram.
@@ -104,7 +103,6 @@ cv::Mat histogram(const cv::Mat &image, int numberOfBins, bool is1D) {
     return feature;
   }
 
-
 cv::Mat multiHistogram(const cv::Mat &image, int numberOfBins = 8) {
 	/**
 	 * Function to create multi histogram.
@@ -150,7 +148,6 @@ cv::Mat multiHistogram(const cv::Mat &image, int numberOfBins = 8) {
     // Return the concatenated histogram as a cv::Mat
     return concatenatedHist;
 }
-
 
 cv::Mat texture(const cv::Mat& image) {
 	/**
@@ -216,6 +213,29 @@ cv::Mat texture(const cv::Mat& image) {
 	return textureHist;
 }
 
+vector<float> extractColorFeatures(const string& image) {
+    /**
+     * Extracting both RBG and hue and then average it and store it in a vector.
+     * 
+     * :param image: image path you want to extract its color
+     */
+    cv::Mat img = cv::imread(image);
+    cv::Mat hsv;
+    cv::cvtColor(img, hsv, cv::COLOR_BGR2HSV);
+    cv::Scalar meanRGB = cv::mean(img);
+    cv::Scalar meanHSV = cv::mean(hsv);
+    return { static_cast<float>(meanRGB[2]), static_cast<float>(meanRGB[1]), static_cast<float>(meanRGB[0]), static_cast<float>(meanHSV[0]) };
+}
+
+// void cbirSearchFunction(const string& image, unordered_map<string, vector<float>>& features) {
+//     vector<float> queryColor = extractColorFeatures(image);
+//     // since image has its full image path
+//     // we will use 
+//     if (dnnFeatures.find(queryFile) == dnnFeatures.end()) {
+//         cerr << "Query image not found in dataset!" << endl;
+//         return;
+//     }
+// }
 
 cv::Mat reshapeTo2D(cv::Mat& mat) {
     if (mat.dims == 3) {
@@ -241,8 +261,6 @@ std::vector<float> matToVector(cv::Mat& mat) {
     mat.reshape(1, 1).copyTo(vec);
     return vec;
 }
-
-
 
 cv::Mat colorTexture(const cv::Mat& image, int numberOfBins = 8) {
     /***

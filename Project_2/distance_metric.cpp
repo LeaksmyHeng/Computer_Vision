@@ -102,3 +102,17 @@ double weightedDistance(const cv::Mat& colorHistogram1, const cv::Mat& textureHi
     return result;
 
 }
+
+double sumOfSquaredDifferenceVector(const vector<float>& targetImage, const vector<float>& image) {
+    /**
+     * Function to calculate sumOfSquaredDifference with vector.
+     */
+    double result = 0.0;
+    for (int i = 0; i < targetImage.size(); i++) {
+        double diff = targetImage[i] - image[i];
+        result += diff * diff;
+    }
+    return result;
+
+}
+
