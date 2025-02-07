@@ -211,10 +211,10 @@ int main(int argc, char *argv[]) {
         cv::Mat img = imread(imagePath);
 
         if (!img.empty()) {
-            // cout << "Displaying image: " << imagePath << " with SSD: " << resultVector[i].second << endl;
+            cout << "Displaying image: " << imagePath << " with SSD: " << resultVector[i].second << endl;
             // Show the image using OpenCV
-            imshow("Top " + to_string(i + 1) + " Image", img);
-            waitKey(0);
+            // imshow("Top " + to_string(i + 1) + " Image", img);
+            // waitKey(0);
         }
     }
 

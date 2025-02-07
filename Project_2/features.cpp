@@ -1,5 +1,8 @@
 /*
   Leaksmy Heng
+  CS5330
+  Feb 07, 2025
+  Project2
   Utility functions for storing image features.
 */
 
@@ -38,7 +41,7 @@ cv::Mat baselineMatching(const cv::Mat &image) {
 	}
     
     // check if image size is smaller than 7.
-    // if it is throw error
+    // return empty Mat as we are trying to get 7x7 metrics
     if (image.cols < 7 || image.rows < 7) {
 		printf("Image too small for 7x7 region.\n");
 		return cv::Mat();
@@ -108,7 +111,7 @@ cv::Mat multiHistogram(const cv::Mat &image, int numberOfBins = 8) {
 	/**
 	 * Function to create multi histogram.
 	 */
-    // Ensure the image is not empty
+
     if (checkingEmptyImage(image)) {
 		return cv::Mat();
 	}
@@ -152,7 +155,7 @@ cv::Mat multiHistogram(const cv::Mat &image, int numberOfBins = 8) {
 
 cv::Mat texture(const cv::Mat& image) {
 	/**
-	 * Computer texture histogram as feature vector.
+	 * Compute texture histogram as feature vector.
 	 * In this case, we use Sobel magnitude image and use a histogram of gradient magnitudes as the texture feature. 
 	 */
 
@@ -162,7 +165,6 @@ cv::Mat texture(const cv::Mat& image) {
 
 	// in the first project, i created sobel filter not on full image, but start at 1 and end with row-1 or col-1
 	// therefore, I will just call opencv sobel filter here
-	// CV_32F is float - the pixel can have any value between 0-1.0, this is useful for some sets of calculations on data - but it has to be converted into 8bits to save or display by multiplying each pixel by 255
 	// https://stackoverflow.com/questions/8377091/what-are-the-differences-between-cv-8u-and-cv-32f-and-what-should-i-worry-about
 	cv::Mat sobelX, sobelY;
 	cv::Sobel(grayScaleImage, sobelX, CV_32F, 1, 0, 3);
@@ -182,19 +184,20 @@ cv::Mat texture(const cv::Mat& image) {
 	// waitKey(0);
 
 	// turn gradientMagnitude to a histogram
+    // this is a 1D histogram
 	int histSize = 8;
 	float rangeStart = 0.0;
 	float rangeEnd = 400.0;
 
 	// initialized histogram to all 0 (1D cause of grayscale)
 	cv::Mat textureHist = cv::Mat::zeros(1, histSize, CV_32F);
-	// calculate binsize
+	// calculate binsize which is 50
 	float binSize = (rangeEnd - rangeStart) / histSize;
 
     // loop through each row and cols of the gradient magnitude
 	for (int i=0; i<gradientMagnitude.rows; i++) {
 		for (int j=0; j<gradientMagnitude.cols; j++) {
-			// get mag value at pixel i & j
+			// get pixel at possition i & j
 			float gradientValue = gradientMagnitude.at<float>(i, j);
 			// check if gradient is within range
 			if (gradientValue >= rangeStart && gradientValue < rangeEnd) {

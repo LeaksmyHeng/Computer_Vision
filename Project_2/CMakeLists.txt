@@ -39,17 +39,17 @@ target_link_libraries(main ${OpenCV_LIBS})
 #     COMMENT "Running the target image with directory path"
 # )
 
-# # Passing the argument to run the fifth task
-# add_custom_command(TARGET main POST_BUILD
-#     COMMAND main ${CMAKE_SOURCE_DIR}/olympus/olympus/pic.0734.jpg ${CMAKE_SOURCE_DIR}/olympus/olympus DNN SSD_V 3
-#     COMMENT "Running the target image with directory path"
-# )
-
-# Passing the argument to run the sixth task
+# Passing the argument to run the fifth task 0164 & 0893
 add_custom_command(TARGET main POST_BUILD
-    COMMAND main ${CMAKE_SOURCE_DIR}/olympus/olympus/pic.0287.jpg ${CMAKE_SOURCE_DIR}/olympus/olympus DNN SSD_V 10
+    COMMAND main ${CMAKE_SOURCE_DIR}/olympus/olympus/pic.0164.jpg ${CMAKE_SOURCE_DIR}/olympus/olympus DNN SSD_V 3
     COMMENT "Running the target image with directory path"
 )
+
+# # Passing the argument to run the sixth task
+# add_custom_command(TARGET main POST_BUILD
+#     COMMAND main ${CMAKE_SOURCE_DIR}/olympus/olympus/pic.0287.jpg ${CMAKE_SOURCE_DIR}/olympus/olympus DNN SSD_V 15
+#     COMMENT "Running the target image with directory path"
+# )
 # # Compare with baseline method using SSD
 # add_custom_command(TARGET main POST_BUILD
 #     COMMAND main ${CMAKE_SOURCE_DIR}/olympus/olympus/pic.1072.jpg ${CMAKE_SOURCE_DIR}/olympus/olympus baseline SSD 3
