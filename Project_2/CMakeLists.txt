@@ -63,7 +63,7 @@ target_link_libraries(main ${OpenCV_LIBS})
 
 # Passing the argument to run the last task 0280 & the 0343
 add_custom_command(TARGET main POST_BUILD
-    COMMAND main ${CMAKE_SOURCE_DIR}/olympus/olympus/pic.0280.jpg ${CMAKE_SOURCE_DIR}/olympus/olympus CBIR CBIR 5
+    COMMAND main ${CMAKE_SOURCE_DIR}/olympus/olympus/pic.0343.jpg ${CMAKE_SOURCE_DIR}/olympus/olympus CBIR CBIR 6
     COMMENT "Running the target image with directory path"
 )
 

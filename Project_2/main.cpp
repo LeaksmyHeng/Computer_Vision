@@ -1,11 +1,11 @@
 /* 
- * Leaksmy Heng
- * CS5330
- * Feb 07, 2025
- * Project2
- * This is the pipeline of the program
- * I implemented step 1 where i call the feature function and distance method function
- * all in one for loop (for loop that is used to go through the images in the database file)
+Leaksmy Heng
+CS5330
+Feb 07, 2025
+Project2
+This is the pipeline of the program
+I implemented step 1 where i call the feature function and distance method function
+all in one for loop (for loop that is used to go through the images in the database file)
 */
 
 #include <iostream>
