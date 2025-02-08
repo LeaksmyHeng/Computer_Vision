@@ -1,3 +1,12 @@
+/*
+  Leaksmy Heng
+  CS5330
+  Feb 07, 2025
+  Project2
+  Header file for feature extraction file.
+  The docstring of each method is in features.cpp
+*/
+
 #ifndef FEATURES_H
 #define FEATURES_H
 

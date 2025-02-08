@@ -1,3 +1,12 @@
+/*
+  Leaksmy Heng
+  CS5330
+  Feb 07, 2025
+  Project2
+  Header file for distance metric.
+  The docstring of each method is in distance_metric.cpp
+*/
+
 #ifndef DISTANCEMETRIC_H
 #define DISTANCEMETRIC_H
 
