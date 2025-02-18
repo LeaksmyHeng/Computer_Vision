@@ -66,12 +66,20 @@ int kMeanImplementation(cv::Mat &src, cv::Mat &dst , int k=2, int max_iteration=
     centers = centers.reshape(1, k);
     centers.convertTo(centers, CV_8U);
 
+    // convert the image to binary 0 and 1 instead
+    double minVal, maxVal;
+    // double thresholdValue = 127.0;
+    cv::minMaxLoc(centers.col(0), &minVal, &maxVal);    // Find the min and max of the first channel (L-channel)
+    double thresholdValue = (minVal + maxVal) / 2;      // Choose the middle of the range as the threshold
+
     // map pixel to the corresponding cluster center
-    dst = cv::Mat(src.size(), src.type());
+    dst = cv::Mat(src.size(), CV_8U);
     for (int i=0; i<height; i++) {
         for (int j=0; j<width; j++) {
             int clusterId = labels.at<int>(i * width + j);
-            dst.at<cv::Vec3b>(i,j) = centers.row(clusterId);
+            uchar pixelValue = centers.at<uchar>(clusterId, 0);
+            // if pixel value is greater than pixel then white 255 else 0
+            dst.at<uchar>(i, j) = (pixelValue > thresholdValue) ? 255 : 0;
         }
     }
 
