@@ -12,6 +12,7 @@ all in one for loop (for loop that is used to go through the images in the datab
 #include <opencv2/opencv.hpp>
 
 #include "Common_Header/thresholding.h"
+#include "Common_Header/morphological.h"
 
 using namespace cv;
 using namespace std;
@@ -42,6 +43,7 @@ int main(int argc, char *argv[]) {
     cv::namedWindow("Video", 1); // identifies a window
     cv::Mat frame;
     cv::Mat grayFrame;
+    cv::Mat morphologicalFrame;
 
     while (true) {
         *capdev >> frame;
@@ -53,7 +55,12 @@ int main(int argc, char *argv[]) {
         // task1: creating thresholding
         // int kMeanImplementation(cv::Mat &src, cv::Mat &dst , int k=2, int max_iteration=10, double epsilon=1.0)
         kMeanImplementation(frame, grayFrame, 2, 3, 1.0);
-        cv::imshow("Video", grayFrame);
+        // task 2 applying morphology which I did using openning
+        applying_opening(grayFrame, morphologicalFrame);
+        
+        cv::imshow("Video", frame);
+        cv::imshow("Thresholding", grayFrame);
+        cv::imshow("Morphological", morphologicalFrame);
 
 
         char key = cv::waitKey(10);
