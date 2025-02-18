@@ -520,10 +520,10 @@ int highPassFaceDetection(cv::Mat &src, cv::Mat &dst) {
         cv::Mat faceRegion = src(face);
 
         // Apply high-pass filter on the face region
-        highPassFilter(faceRegion, faceHighPass);  // Assuming highPassFilter is defined to apply the filter
+        highPassFilter(faceRegion, faceHighPass);
 
         // Replace the face area with the high-pass filtered result
-        faceHighPass.copyTo(dst(face));  // Copy the filtered face back to the destination image
+        faceHighPass.copyTo(dst(face));
     }
     return 0;
 }
