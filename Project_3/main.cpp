@@ -13,6 +13,7 @@ all in one for loop (for loop that is used to go through the images in the datab
 
 #include "Common_Header/thresholding.h"
 #include "Common_Header/morphological.h"
+#include "Common_Header/segmentation.h"
 
 using namespace cv;
 using namespace std;
@@ -44,6 +45,7 @@ int main(int argc, char *argv[]) {
     cv::Mat frame;
     cv::Mat grayFrame;
     cv::Mat morphologicalFrame;
+    cv::Mat stats, centroids, connectedComponent;
 
     while (true) {
         *capdev >> frame;
@@ -57,10 +59,25 @@ int main(int argc, char *argv[]) {
         kMeanImplementation(frame, grayFrame, 2, 3, 1.0);
         // task 2 applying morphology which I did using openning
         applying_opening(grayFrame, morphologicalFrame);
+        applying_connectedComponents(morphologicalFrame, connectedComponent, stats, centroids);
         
         cv::imshow("Video", frame);
-        cv::imshow("Thresholding", grayFrame);
-        cv::imshow("Morphological", morphologicalFrame);
+        // cv::imshow("Thresholding", grayFrame);
+        // cv::imshow("Morphological", morphologicalFrame);
+
+        // i received an error on Error: Assertion failed (src_depth != CV_16F && src_depth != CV_32S) in convertToShow
+        // which mean the connectedComponent can't be display so i normalized it here.
+        if (connectedComponent.type() == CV_16F) {
+            // Normalize to range [0, 255] and convert to 8-bit unsigned image for display
+            cv::normalize(connectedComponent, connectedComponent, 0, 255, cv::NORM_MINMAX);  // Normalize the image to the range 0-255
+            connectedComponent.convertTo(connectedComponent, CV_8U);
+        }
+        else if (connectedComponent.type() == CV_32S) {
+            // Optionally, normalize and convert a CV_32S image similarly if needed
+            cv::normalize(connectedComponent, connectedComponent, 0, 255, cv::NORM_MINMAX);  // Normalize the image to the range 0-255
+            connectedComponent.convertTo(connectedComponent, CV_8U);  // Convert to 8-bit unsigned image
+        }
+        cv::imshow("ConnectedComponent", connectedComponent * 50);
 
 
         char key = cv::waitKey(10);
