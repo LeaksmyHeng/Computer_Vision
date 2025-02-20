@@ -69,7 +69,7 @@ cv::RotatedRect bounding_box(cv::Mat& region, double x, double y, double theta) 
 }
 
 
-void applying_feature_region(cv::Mat &src, cv::Mat &dst, cv::Mat &stats, cv::Mat &centroids, int regionId) {
+void applying_feature_region(cv::Mat &src, cv::Mat &dst, cv::Mat &stats, cv::Mat &centroids, int regionId, bool save_file) {
     // Get the stats and centroid for the given region
     int x = stats.at<int>(regionId, cv::CC_STAT_LEFT);
     int y = stats.at<int>(regionId, cv::CC_STAT_TOP);
@@ -138,7 +138,7 @@ void applying_connectedComponents(cv::Mat &src, cv::Mat &dst, cv::Mat &stats, cv
         cv::rectangle(dst, cv::Rect(x, y, w, h), color, 5);
 
         // applying feature region function
-        applying_feature_region(src, dst, stats, centroids, i);
+        applying_feature_region(src, dst, stats, centroids, i, is_save_to_file);
 
         // // print out the stats
         // std::cout << "Region " << i << ":" << std::endl;
