@@ -37,13 +37,13 @@ void applying_connectedComponents(cv::Mat &src, cv::Mat &dst, cv::Mat &stats, cv
         int w = stats.at<int>(i, cv::CC_STAT_WIDTH);
         int h = stats.at<int>(i, cv::CC_STAT_HEIGHT);
         
-        // draw rectangle with white color
-        cv::rectangle(dst, cv::Rect(x, y, w, h), cv::Scalar(255), 2);
+        // draw rectangle with black color (cause my background is white)
+        cv::rectangle(dst, cv::Rect(x, y, w, h), cv::Scalar(0, 0, 255), 2);
 
         // print out the stats
-        std::cout << "Component " << i << ":" << std::endl;
-        std::cout << "  Area: " << stats.at<int>(i, cv::CC_STAT_AREA) << std::endl;
-        std::cout << "  Bounding Box: (" 
+        std::cout << "Region " << i << ":" << std::endl;
+        std::cout << "Area: " << stats.at<int>(i, cv::CC_STAT_AREA) << std::endl;
+        std::cout << "Bounding Box: (" 
                   << stats.at<int>(i, cv::CC_STAT_LEFT) << ", "
                   << stats.at<int>(i, cv::CC_STAT_TOP) << ") -> (" 
                   << stats.at<int>(i, cv::CC_STAT_WIDTH) << " x " 

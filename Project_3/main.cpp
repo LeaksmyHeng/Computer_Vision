@@ -30,7 +30,7 @@ int main(int argc, char *argv[]) {
 
     // open the video device
     // 1 is my external webcam. use 0 for laptop camera
-    capdev = new cv::VideoCapture(1);
+    capdev = new cv::VideoCapture(0);
     if( !capdev->isOpened() ) {
         printf("Unable to open video device\n");
         return(-1);
@@ -65,15 +65,16 @@ int main(int argc, char *argv[]) {
         // cv::imshow("Thresholding", grayFrame);
         // cv::imshow("Morphological", morphologicalFrame);
 
+        
         // i received an error on Error: Assertion failed (src_depth != CV_16F && src_depth != CV_32S) in convertToShow
         // which mean the connectedComponent can't be display so i normalized it here.
+        // Normalize to range [0, 255] and convert to 8-bit unsigned image for display
         if (connectedComponent.type() == CV_16F) {
-            // Normalize to range [0, 255] and convert to 8-bit unsigned image for display
             cv::normalize(connectedComponent, connectedComponent, 0, 255, cv::NORM_MINMAX);  // Normalize the image to the range 0-255
             connectedComponent.convertTo(connectedComponent, CV_8U);
         }
+        // normalize and convert a CV_32S image similarly if needed
         else if (connectedComponent.type() == CV_32S) {
-            // Optionally, normalize and convert a CV_32S image similarly if needed
             cv::normalize(connectedComponent, connectedComponent, 0, 255, cv::NORM_MINMAX);  // Normalize the image to the range 0-255
             connectedComponent.convertTo(connectedComponent, CV_8U);  // Convert to 8-bit unsigned image
         }
