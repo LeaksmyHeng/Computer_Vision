@@ -17,6 +17,7 @@
 #include <ctime>
 #include <iostream>
 #include <filesystem>
+#include <fstream>
 
 using namespace cv;
 using namespace std;
@@ -70,6 +71,7 @@ cv::RotatedRect bounding_box(cv::Mat& region, double x, double y, double theta) 
 }
 
 bool checkIfFileExists(const std::string& filePath) {
+    // https://stackoverflow.com/questions/12774207/fastest-way-to-check-if-a-file-exists-using-standard-c-c11-14-17-c
     return std::filesystem::exists(filePath);
 }
 
@@ -111,9 +113,25 @@ void applying_feature_region(cv::Mat &src, cv::Mat &dst, cv::Mat &stats, cv::Mat
 
     if (save_file) {
         // check if output.csv exist
+        // https://www.geeksforgeeks.org/c-program-to-create-a-file/
         std::string filePath = "output.csv";
         bool file_exist = checkIfFileExists(filePath);
-        std::cout << "File exist: " << file_exist << std::endl;
+        
+        if (!file_exist) {
+            std::cout << "File exist does not exist" << file_exist << std::endl;
+            std::ofstream file;
+            file.open(filePath);
+            // Check if the file was successfully created.
+            if (!file.is_open()){
+                cout << "Error in creating file!" << endl;
+                return;
+            }
+            cout << "File created successfully." << endl;
+            file.close();
+        }
+        else {
+            std::cout << "File exist already exist " << std::endl;
+        }
     }
 
     // Display the calculated features
@@ -124,7 +142,7 @@ void applying_feature_region(cv::Mat &src, cv::Mat &dst, cv::Mat &stats, cv::Mat
 }
 
 
-void applying_connectedComponents(cv::Mat &src, cv::Mat &dst, cv::Mat &stats, cv::Mat &centroids, bool is_save_to_file=false){
+void applying_connectedComponents(cv::Mat &src, cv::Mat &dst, cv::Mat &stats, cv::Mat &centroids, bool is_save_to_file){
     /**
      * Applying connected components function.
      * 
