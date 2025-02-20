@@ -47,6 +47,8 @@ int main(int argc, char *argv[]) {
     cv::Mat morphologicalFrame;
     cv::Mat stats, centroids, connectedComponent;
 
+    bool save_to_file = false;
+
     while (true) {
         *capdev >> frame;
         if( frame.empty() ) {
@@ -54,14 +56,28 @@ int main(int argc, char *argv[]) {
             break;
         }
 
+        char key = cv::waitKey(10);
+        if (key == 'q' || key == 'Q') {
+            printf("Quitting the program\n");
+            break;
+        }
+        // If 'N' or 'n' is pressed, save the feature vectors to file
+        else if (key == 'n' || key == 'N') {
+            save_to_file = true;  // Enable saving feature vectors to file
+            printf("Collecting features and saving them...");
+        }
+        else {
+            save_to_file = false; // Normal mode, no feature saving
+        }
+
         // task1: creating thresholding
         // int kMeanImplementation(cv::Mat &src, cv::Mat &dst , int k=2, int max_iteration=10, double epsilon=1.0)
         kMeanImplementation(frame, grayFrame, 2, 3, 1.0);
         // task 2 applying morphology which I did using openning
         applying_opening(grayFrame, morphologicalFrame);
-        applying_connectedComponents(morphologicalFrame, connectedComponent, stats, centroids);
+        applying_connectedComponents(morphologicalFrame, connectedComponent, stats, centroids, save_to_file);
         
-        cv::imshow("Video", frame);
+        // cv::imshow("Video", frame);
         // cv::imshow("Thresholding", grayFrame);
         // cv::imshow("Morphological", morphologicalFrame);
 
@@ -80,13 +96,6 @@ int main(int argc, char *argv[]) {
         }
         cv::imshow("ConnectedComponent", connectedComponent * 50);
 
-
-        char key = cv::waitKey(10);
-        // std::cout << "Key pressed: \n" << static_cast<char>(key) << std::endl;
-        if( key == 'q') {
-            printf("Quiting the program\n");
-            break;
-        }
     }
     delete capdev;
     // Closes all the frames

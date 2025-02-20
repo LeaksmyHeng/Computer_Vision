@@ -15,6 +15,6 @@ using namespace cv;
 /**
  * function use to find connected component. I use opencv function for this.
  */
-void applying_connectedComponents(cv::Mat &src, cv::Mat &dst, cv::Mat &stats, cv::Mat &centroids);
+void applying_connectedComponents(cv::Mat &src, cv::Mat &dst, cv::Mat &stats, cv::Mat &centroids, bool is_save_to_file=false);
 
 #endif // SEGMENTATION_H

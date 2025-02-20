@@ -68,6 +68,7 @@ cv::RotatedRect bounding_box(cv::Mat& region, double x, double y, double theta) 
     return cv::RotatedRect(centroid, size, theta * 180.0 / CV_PI);
 }
 
+
 void applying_feature_region(cv::Mat &src, cv::Mat &dst, cv::Mat &stats, cv::Mat &centroids, int regionId) {
     // Get the stats and centroid for the given region
     int x = stats.at<int>(regionId, cv::CC_STAT_LEFT);
@@ -110,7 +111,8 @@ void applying_feature_region(cv::Mat &src, cv::Mat &dst, cv::Mat &stats, cv::Mat
     std::cout << "  Orientation Angle (Axis of Least Central Moment): " << angle << " radians" << std::endl;
 }
 
-void applying_connectedComponents(cv::Mat &src, cv::Mat &dst, cv::Mat &stats, cv::Mat &centroids){
+
+void applying_connectedComponents(cv::Mat &src, cv::Mat &dst, cv::Mat &stats, cv::Mat &centroids, bool is_save_to_file=false){
     /**
      * Applying connected components function.
      * 
