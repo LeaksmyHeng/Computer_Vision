@@ -13,10 +13,28 @@
  */
 
 #include <opencv2/opencv.hpp>
+#include <cstdlib>
+#include <ctime>
+#include <iostream>
 
 using namespace cv;
 using namespace std;
 
+
+cv::Scalar generateRandomColor() {
+    /**
+     * Add random color generator for cv::scalar
+     */
+    int r, g, b;
+    int threshold = 200; // Any value above this will be considered "too light"
+
+    do {
+        r = rand() % 256; // Random number between 0 and 255
+        g = rand() % 256;
+        b = rand() % 256;
+    } while (r > threshold && g > threshold && b > threshold); 
+    return cv::Scalar(b, g, r);
+}
 
 void applying_connectedComponents(cv::Mat &src, cv::Mat &dst, cv::Mat &stats, cv::Mat &centroids){
     /**
@@ -37,7 +55,9 @@ void applying_connectedComponents(cv::Mat &src, cv::Mat &dst, cv::Mat &stats, cv
         int w = stats.at<int>(i, cv::CC_STAT_WIDTH);
         int h = stats.at<int>(i, cv::CC_STAT_HEIGHT);
         
-        // draw rectangle with black color (cause my background is white)
+        // draw rectangle with white color
+        // todo: i specified red but still get white
+        // i even use the random color generator but still get white
         cv::rectangle(dst, cv::Rect(x, y, w, h), cv::Scalar(0, 0, 255), 2);
 
         // print out the stats
