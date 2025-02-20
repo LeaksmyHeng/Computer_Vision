@@ -16,6 +16,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <iostream>
+#include <filesystem>
 
 using namespace cv;
 using namespace std;
@@ -68,6 +69,10 @@ cv::RotatedRect bounding_box(cv::Mat& region, double x, double y, double theta) 
     return cv::RotatedRect(centroid, size, theta * 180.0 / CV_PI);
 }
 
+bool checkIfFileExists(const std::string& filePath) {
+    return std::filesystem::exists(filePath);
+}
+
 
 void applying_feature_region(cv::Mat &src, cv::Mat &dst, cv::Mat &stats, cv::Mat &centroids, int regionId, bool save_file) {
     // Get the stats and centroid for the given region
@@ -102,6 +107,13 @@ void applying_feature_region(cv::Mat &src, cv::Mat &dst, cv::Mat &stats, cv::Mat
         srand(static_cast<unsigned int>(time(0)));
         cv::Scalar color = generateRandomColor();
         cv::line(dst, vertices[i], vertices[(i + 1) % 4], color, 5);
+    }
+
+    if (save_file) {
+        // check if output.csv exist
+        std::string filePath = "output.csv";
+        bool file_exist = checkIfFileExists(filePath);
+        std::cout << "File exist: " << file_exist << std::endl;
     }
 
     // Display the calculated features

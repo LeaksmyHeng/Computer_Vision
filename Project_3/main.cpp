@@ -77,7 +77,7 @@ int main(int argc, char *argv[]) {
         applying_opening(grayFrame, morphologicalFrame);
         applying_connectedComponents(morphologicalFrame, connectedComponent, stats, centroids, save_to_file);
         
-        // cv::imshow("Video", frame);
+        cv::imshow("Video", frame);
         // cv::imshow("Thresholding", grayFrame);
         // cv::imshow("Morphological", morphologicalFrame);
 
