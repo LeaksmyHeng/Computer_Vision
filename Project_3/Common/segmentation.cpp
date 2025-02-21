@@ -27,15 +27,7 @@ cv::Scalar generateRandomColor() {
     /**
      * Add random color generator for cv::scalar
      */
-    int r, g, b;
-    int threshold = 200; // Any value above this will be considered "too light"
-
-    do {
-        r = rand() % 256; // Random number between 0 and 255
-        g = rand() % 256;
-        b = rand() % 256;
-    } while (r > threshold && g > threshold && b > threshold); 
-    return cv::Scalar(b, g, r);
+    return cv::Scalar(rand() % 256, rand() % 256, rand() % 256);
 }
 
 
@@ -172,22 +164,27 @@ void applying_connectedComponents(cv::Mat &src, cv::Mat &dst, cv::Mat &stats, cv
      */
     // this CV_32S output 4 channel RGBA
     int result = cv::connectedComponentsWithStats(src, dst, stats, centroids, 8, CV_32S);
-
+    
     // draw boundary on the dst image
     for (int i = 1; i < result; i++) {
         int x = stats.at<int>(i, cv::CC_STAT_LEFT);
         int y = stats.at<int>(i, cv::CC_STAT_TOP);
         int w = stats.at<int>(i, cv::CC_STAT_WIDTH);
         int h = stats.at<int>(i, cv::CC_STAT_HEIGHT);
-        
-        // draw rectangle with white color
-        // todo: i specified red but still get white, so play with the luminous cause your image has 4 channel
-        srand(static_cast<unsigned int>(time(0)));
-        cv::Scalar color = generateRandomColor();
-        cv::rectangle(dst, cv::Rect(x, y, w, h), color, 5);
 
-        // applying feature region function
-        applying_feature_region(src, dst, stats, centroids, i, label, feature_list, is_save_to_file);
+        // ignore small region
+        if (w > 20 && h > 20) {
+            // Generate random color for each region
+            // draw rectangle with white color
+            // todo: i specified red but still get white, so play with the luminous cause your image has 4 channel
+            srand(static_cast<unsigned int>(time(0)));
+            cv::Scalar color = generateRandomColor();
+            cv::rectangle(dst, cv::Rect(x, y, w, h), color, 5);
+            // applying feature region function
+            applying_feature_region(src, dst, stats, centroids, i, label, feature_list, is_save_to_file);
+        }
+
+        
 
         // // print out the stats
         // std::cout << "Region " << i << ":" << std::endl;

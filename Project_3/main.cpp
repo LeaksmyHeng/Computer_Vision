@@ -90,12 +90,14 @@ int main(int argc, char *argv[]) {
 
         // task1: creating thresholding
         // int kMeanImplementation(cv::Mat &src, cv::Mat &dst , int k=2, int max_iteration=10, double epsilon=1.0)
-        kMeanImplementation(frame, grayFrame, 2, 3, 1.0);
+        // kMeanImplementation(frame, grayFrame, 2, 3, 1.0);
+        cv::threshold(frame, grayFrame, 127, 255, cv::THRESH_BINARY);
+        cv::cvtColor(grayFrame, grayFrame, cv::COLOR_BGR2GRAY);
         // task 2 applying morphology which I did using openning
         applying_opening(grayFrame, morphologicalFrame);
         applying_connectedComponents(morphologicalFrame, connectedComponent, stats, centroids, save_to_file, currentLabel, featureList);
         
-        cv::imshow("Video", frame);
+        // cv::imshow("Video", frame);
         // cv::imshow("Thresholding", grayFrame);
         // cv::imshow("Morphological", morphologicalFrame);
 
