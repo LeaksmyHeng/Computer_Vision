@@ -10,6 +10,9 @@ all in one for loop (for loop that is used to go through the images in the datab
 
 
 #include <opencv2/opencv.hpp>
+#include <iostream>
+#include <filesystem>
+#include <fstream>
 
 #include "Common_Header/thresholding.h"
 #include "Common_Header/morphological.h"
@@ -18,6 +21,7 @@ all in one for loop (for loop that is used to go through the images in the datab
 using namespace cv;
 using namespace std;
 namespace fs = std::filesystem;
+
 
 int main(int argc, char *argv[]) {
     /**
@@ -48,6 +52,8 @@ int main(int argc, char *argv[]) {
     cv::Mat stats, centroids, connectedComponent;
 
     bool save_to_file = false;
+    string currentLabel;
+    vector<ObjectFeature> featureList;
 
     while (true) {
         *capdev >> frame;
@@ -62,9 +68,17 @@ int main(int argc, char *argv[]) {
             break;
         }
         // If 'N' or 'n' is pressed, save the feature vectors to file
+        // when i have the file open csv and write it one by one, my program become in efficient
+        // as of now, I have it store to a vector.
+        // when users press 's' or 'S', then write it to a file and clear that vector.
         else if (key == 'n' || key == 'N') {
             save_to_file = true;  // Enable saving feature vectors to file
-            printf("Collecting features and saving them...");
+            std::cout << "Collecting features and saving them...";
+            std::cout << "Enter a label for the current object: ";
+            std::getline(std::cin, currentLabel);
+        }
+        else if (key == 's' || key == 'S') {
+            save_to_file = false;  // Disable saving to memory
         }
         else {
             save_to_file = false; // Normal mode, no feature saving
@@ -75,7 +89,7 @@ int main(int argc, char *argv[]) {
         kMeanImplementation(frame, grayFrame, 2, 3, 1.0);
         // task 2 applying morphology which I did using openning
         applying_opening(grayFrame, morphologicalFrame);
-        applying_connectedComponents(morphologicalFrame, connectedComponent, stats, centroids, save_to_file);
+        applying_connectedComponents(morphologicalFrame, connectedComponent, stats, centroids, save_to_file, currentLabel, featureList);
         
         cv::imshow("Video", frame);
         // cv::imshow("Thresholding", grayFrame);

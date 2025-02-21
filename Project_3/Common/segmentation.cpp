@@ -75,8 +75,18 @@ bool checkIfFileExists(const std::string& filePath) {
     return std::filesystem::exists(filePath);
 }
 
+struct ObjectFeature {
+    int regionId;
+    string label;
+    vector<double> featureVector;
+};
 
-void applying_feature_region(cv::Mat &src, cv::Mat &dst, cv::Mat &stats, cv::Mat &centroids, int regionId, bool save_file) {
+void save_features_to_file(const vector<ObjectFeature> &feature_list) {
+
+}
+
+
+void applying_feature_region(cv::Mat &src, cv::Mat &dst, cv::Mat &stats, cv::Mat &centroids, int regionId, string label, vector<ObjectFeature> &feature_list, bool save_file) {
     // Get the stats and centroid for the given region
     int x = stats.at<int>(regionId, cv::CC_STAT_LEFT);
     int y = stats.at<int>(regionId, cv::CC_STAT_TOP);
@@ -111,27 +121,13 @@ void applying_feature_region(cv::Mat &src, cv::Mat &dst, cv::Mat &stats, cv::Mat
         cv::line(dst, vertices[i], vertices[(i + 1) % 4], color, 5);
     }
 
+    // add all feature to a feature
+    std::vector<double> feature_vector = { percentFilled, bboxRatio, angle };
+
     if (save_file) {
-        // check if output.csv exist
-        // https://www.geeksforgeeks.org/c-program-to-create-a-file/
-        std::string filePath = "output.csv";
-        bool file_exist = checkIfFileExists(filePath);
-        
-        if (!file_exist) {
-            std::cout << "File exist does not exist" << file_exist << std::endl;
-            std::ofstream file;
-            file.open(filePath);
-            // Check if the file was successfully created.
-            if (!file.is_open()){
-                cout << "Error in creating file!" << endl;
-                return;
-            }
-            cout << "File created successfully." << endl;
-            file.close();
-        }
-        else {
-            std::cout << "File exist already exist " << std::endl;
-        }
+        ObjectFeature objFeature = {regionId, label, feature_vector};
+        feature_list.push_back(objFeature);
+        std::cout << "Feature vector saved for region ID: " << regionId << std::endl;
     }
 
     // Display the calculated features
@@ -142,7 +138,7 @@ void applying_feature_region(cv::Mat &src, cv::Mat &dst, cv::Mat &stats, cv::Mat
 }
 
 
-void applying_connectedComponents(cv::Mat &src, cv::Mat &dst, cv::Mat &stats, cv::Mat &centroids, bool is_save_to_file){
+void applying_connectedComponents(cv::Mat &src, cv::Mat &dst, cv::Mat &stats, cv::Mat &centroids, bool is_save_to_file, string label, vector<ObjectFeature> &feature_list){
     /**
      * Applying connected components function.
      * 
@@ -168,7 +164,7 @@ void applying_connectedComponents(cv::Mat &src, cv::Mat &dst, cv::Mat &stats, cv
         cv::rectangle(dst, cv::Rect(x, y, w, h), color, 5);
 
         // applying feature region function
-        applying_feature_region(src, dst, stats, centroids, i, is_save_to_file);
+        applying_feature_region(src, dst, stats, centroids, i, label, feature_list, is_save_to_file);
 
         // // print out the stats
         // std::cout << "Region " << i << ":" << std::endl;

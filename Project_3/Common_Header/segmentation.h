@@ -15,6 +15,11 @@ using namespace cv;
 /**
  * function use to find connected component. I use opencv function for this.
  */
-void applying_connectedComponents(cv::Mat &src, cv::Mat &dst, cv::Mat &stats, cv::Mat &centroids, bool is_save_to_file=false);
+struct ObjectFeature {
+    int regionId;
+    string label;
+    vector<double> featureVector;
+};
+void applying_connectedComponents(cv::Mat &src, cv::Mat &dst, cv::Mat &stats, cv::Mat &centroids, bool is_save_to_file, string label, vector<ObjectFeature> &feature_list);
 
 #endif // SEGMENTATION_H
