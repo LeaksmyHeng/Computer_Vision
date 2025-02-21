@@ -54,6 +54,7 @@ int main(int argc, char *argv[]) {
     bool save_to_file = false;
     string currentLabel;
     vector<ObjectFeature> featureList;
+    const std::string outputFilename = "object_features.csv";
 
     while (true) {
         *capdev >> frame;
@@ -78,7 +79,10 @@ int main(int argc, char *argv[]) {
             std::getline(std::cin, currentLabel);
         }
         else if (key == 's' || key == 'S') {
-            save_to_file = false;  // Disable saving to memory
+            std::cout << "Save to file";
+            save_features_to_csv(featureList, outputFilename);      // save to csv
+            save_to_file = false;                                   // Disable saving to memory
+            featureList.clear();                                    // clear the struct
         }
         else {
             save_to_file = false; // Normal mode, no feature saving

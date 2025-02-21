@@ -21,5 +21,6 @@ struct ObjectFeature {
     vector<double> featureVector;
 };
 void applying_connectedComponents(cv::Mat &src, cv::Mat &dst, cv::Mat &stats, cv::Mat &centroids, bool is_save_to_file, string label, vector<ObjectFeature> &feature_list);
+void save_features_to_csv(const vector<ObjectFeature> &featureList, const std::string &filename);
 
 #endif // SEGMENTATION_H

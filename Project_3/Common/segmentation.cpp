@@ -81,8 +81,31 @@ struct ObjectFeature {
     vector<double> featureVector;
 };
 
-void save_features_to_file(const vector<ObjectFeature> &feature_list) {
+void save_features_to_csv(const vector<ObjectFeature> &featureList, const std::string &filename) {
+    // Open the file in append mode to save the features
+    std::ofstream file(filename, std::ios::app);
 
+    if (!file.is_open()) {
+        std::cerr << "Failed to open file for saving features!" << std::endl;
+        return;
+    }
+
+    // Write the CSV headers if the file is empty
+    if (file.tellp() == 0) { // Check if file is empty
+        file << "RegionID,Label,Feature1,Feature2,Feature3\n";  // Column headers
+    }
+
+    // Write the feature vectors to the file
+    for (const auto &objFeature : featureList) {
+        file << objFeature.regionId << "," << objFeature.label;
+        for (const auto &feature : objFeature.featureVector) {
+            file << "," << feature;
+        }
+        file << "\n";
+    }
+
+    file.close();
+    std::cout << "Features saved to CSV file." << std::endl;
 }
 
 
