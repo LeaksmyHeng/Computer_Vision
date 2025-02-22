@@ -23,10 +23,40 @@ using namespace cv;
 using namespace std;
 
 
+struct ObjectFeature {
+    /**
+     * Struct to store the feature.
+     */
+    int regionId;
+    string label;
+    vector<double> featureVector;
+};
+
+
+std::vector<cv::Scalar> fixedColors = {
+    cv::Scalar(255, 100, 100), // Light Red
+    cv::Scalar(255, 0, 0),     // Blue
+    cv::Scalar(255, 0, 255),   // Pink
+    cv::Scalar(0, 255, 255),   // Yellow
+    cv::Scalar(0, 255, 0)      // Green
+};
+
+
+cv::Scalar generateFixedRandomColor(const std::vector<cv::Scalar>& colors) {
+    /**
+     * picked random color out of the color index
+     */
+    int index = rand() % colors.size();
+    return colors[index];
+}
+
+
 cv::Scalar generateRandomColor() {
     /**
      * Add random color generator for cv::scalar
      */
+    static unsigned int seed = time(0); // Initialize once on first call
+    seed += 1;                          // Increment the seed for each call
     return cv::Scalar(rand() % 256, rand() % 256, rand() % 256);
 }
 
@@ -62,29 +92,23 @@ cv::RotatedRect bounding_box(cv::Mat& region, double x, double y, double theta) 
     return cv::RotatedRect(centroid, size, theta * 180.0 / CV_PI);
 }
 
+
 bool checkIfFileExists(const std::string& filePath) {
     // https://stackoverflow.com/questions/12774207/fastest-way-to-check-if-a-file-exists-using-standard-c-c11-14-17-c
     return std::filesystem::exists(filePath);
 }
 
-struct ObjectFeature {
-    int regionId;
-    string label;
-    vector<double> featureVector;
-};
 
 void save_features_to_csv(const vector<ObjectFeature> &featureList, const std::string &filename) {
+    /**
+     * Function to save information in the vector object to csv file.
+     */
     // Open the file in append mode to save the features
     std::ofstream file(filename, std::ios::app);
 
     if (!file.is_open()) {
         std::cerr << "Failed to open file for saving features!" << std::endl;
         return;
-    }
-
-    // Write the CSV headers if the file is empty
-    if (file.tellp() == 0) { // Check if file is empty
-        file << "RegionID,Label,Feature1,Feature2,Feature3\n";  // Column headers
     }
 
     // Write the feature vectors to the file
@@ -102,7 +126,11 @@ void save_features_to_csv(const vector<ObjectFeature> &featureList, const std::s
 
 
 void applying_feature_region(cv::Mat &src, cv::Mat &dst, cv::Mat &stats, cv::Mat &centroids, int regionId, string label, vector<ObjectFeature> &feature_list, bool save_file) {
-    // Get the stats and centroid for the given region
+    /**
+     * Function to apply feature region to the specified region id.
+     */
+    
+     // Get the stats and centroid for the given region
     int x = stats.at<int>(regionId, cv::CC_STAT_LEFT);
     int y = stats.at<int>(regionId, cv::CC_STAT_TOP);
     int w = stats.at<int>(regionId, cv::CC_STAT_WIDTH);
@@ -126,13 +154,15 @@ void applying_feature_region(cv::Mat &src, cv::Mat &dst, cv::Mat &stats, cv::Mat
 
     // getting the oob https://docs.opencv.org/3.4/de/d62/tutorial_bounding_rotated_ellipses.html
     cv::RotatedRect obb = bounding_box(region, centroid.x, centroid.y, angle);
+    // cv::RotatedRect obb = cv::minAreaRect(region);
     cv::Point2f vertices[4];
     obb.points(vertices);
 
     // Draw the region and OBB on the image
     for (int i = 0; i < 4; i++) {
-        srand(static_cast<unsigned int>(time(0)));
-        cv::Scalar color = generateRandomColor();
+        // srand(static_cast<unsigned int>(time(0)));
+        // cv::Scalar color = generateRandomColor();
+        cv::Scalar color = generateFixedRandomColor(fixedColors);
         cv::line(dst, vertices[i], vertices[(i + 1) % 4], color, 5);
     }
 
@@ -163,7 +193,10 @@ void applying_connectedComponents(cv::Mat &src, cv::Mat &dst, cv::Mat &stats, cv
      * :param centroid: matrix to stored centroid data
      */
     // this CV_32S output 4 channel RGBA
-    int result = cv::connectedComponentsWithStats(src, dst, stats, centroids, 8, CV_32S);
+    cv::Mat labels;
+    int result = cv::connectedComponentsWithStats(src, labels, stats, centroids);
+    cv::cvtColor(src, dst, cv::COLOR_GRAY2BGR);
+    
     
     // draw boundary on the dst image
     for (int i = 1; i < result; i++) {
@@ -173,30 +206,28 @@ void applying_connectedComponents(cv::Mat &src, cv::Mat &dst, cv::Mat &stats, cv
         int h = stats.at<int>(i, cv::CC_STAT_HEIGHT);
 
         // ignore small region
-        if (w > 20 && h > 20) {
+        if (x > 50 && y > 50) {
             // Generate random color for each region
             // draw rectangle with white color
             // todo: i specified red but still get white, so play with the luminous cause your image has 4 channel
-            srand(static_cast<unsigned int>(time(0)));
-            cv::Scalar color = generateRandomColor();
-            cv::rectangle(dst, cv::Rect(x, y, w, h), color, 5);
+            // cv::Scalar color = generateRandomColor();
+            cv::Scalar color = generateFixedRandomColor(fixedColors);
+            cv::rectangle(dst, cv::Rect(x, y, w, h), color, 3);
+            // // print out the stats
+            // std::cout << "Region " << i << ":" << std::endl;
+            // std::cout << "Area: " << stats.at<int>(i, cv::CC_STAT_AREA) << std::endl;
+            // std::cout << "Bounding Box: (" 
+            //           << x << ", "
+            //           << y << ") -> (" 
+            //           << w << " x " 
+            //           << h << ")" << std::endl;
+            // std::cout << "  Centroid: (" 
+            //           << centroids.at<double>(i, 0) << ", "
+            //           << centroids.at<double>(i, 1) << ")" << std::endl;
+            
             // applying feature region function
             applying_feature_region(src, dst, stats, centroids, i, label, feature_list, is_save_to_file);
         }
-
-        
-
-        // // print out the stats
-        // std::cout << "Region " << i << ":" << std::endl;
-        // std::cout << "Area: " << stats.at<int>(i, cv::CC_STAT_AREA) << std::endl;
-        // std::cout << "Bounding Box: (" 
-        //           << stats.at<int>(i, cv::CC_STAT_LEFT) << ", "
-        //           << stats.at<int>(i, cv::CC_STAT_TOP) << ") -> (" 
-        //           << stats.at<int>(i, cv::CC_STAT_WIDTH) << " x " 
-        //           << stats.at<int>(i, cv::CC_STAT_HEIGHT) << ")" << std::endl;
-        // std::cout << "  Centroid: (" 
-        //           << centroids.at<double>(i, 0) << ", "
-        //           << centroids.at<double>(i, 1) << ")" << std::endl;
     }
     
 }

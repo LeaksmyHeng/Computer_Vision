@@ -22,6 +22,7 @@ void applying_opening(cv::Mat &src, cv::Mat &dst) {
 
     // uses 4 connected kernel for erosion process and 8 in dilation process
     // https://docs.opencv.org/4.x/d9/d61/tutorial_py_morphological_ops.html
+    // first try is 4 connected kernel, second try 25x25
     cv::Mat fourByfourKernel = cv::getStructuringElement(cv::MORPH_CROSS, cv::Size(3,3));
     cv::Mat eightByeightKernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(3,3));
 

@@ -62,9 +62,10 @@ int main(int argc, char *argv[]) {
             printf("frame is empty\n");
             break;
         }
-
+        cv::imshow("frame", frame);
         char key = cv::waitKey(10);
         if (key == 'q' || key == 'Q') {
+            save_features_to_csv(featureList, outputFilename);
             printf("Quitting the program\n");
             break;
         }
@@ -77,12 +78,19 @@ int main(int argc, char *argv[]) {
             std::cout << "Collecting features and saving them...";
             std::cout << "Enter a label for the current object: ";
             std::getline(std::cin, currentLabel);
+            cv::imshow("ConnectedComponent", connectedComponent * 50);
         }
         else if (key == 's' || key == 'S') {
+            cv::imshow("ConnectedComponent", connectedComponent * 50);
             std::cout << "Save to file";
             save_features_to_csv(featureList, outputFilename);      // save to csv
             save_to_file = false;                                   // Disable saving to memory
             featureList.clear();                                    // clear the struct
+            
+        }
+        else if (key == 'i') {
+            // apply_classification_to_video(frame, featureList, stats, centroids);
+            cv::imshow("inference", frame);
         }
         else {
             save_to_file = false; // Normal mode, no feature saving
@@ -91,10 +99,14 @@ int main(int argc, char *argv[]) {
         // task1: creating thresholding
         // int kMeanImplementation(cv::Mat &src, cv::Mat &dst , int k=2, int max_iteration=10, double epsilon=1.0)
         // kMeanImplementation(frame, grayFrame, 2, 3, 1.0);
-        cv::threshold(frame, grayFrame, 127, 255, cv::THRESH_BINARY);
-        cv::cvtColor(grayFrame, grayFrame, cv::COLOR_BGR2GRAY);
+        GaussianBlur(frame, frame, Size(5, 5), 0);
+        cv::cvtColor(frame, frame, cv::COLOR_BGR2GRAY);
+        // cv::threshold(frame, grayFrame, 125, 255, cv::THRESH_BINARY);
+        cv::threshold(frame, grayFrame, 127, 255, cv::THRESH_BINARY_INV);
+        
         // task 2 applying morphology which I did using openning
         applying_opening(grayFrame, morphologicalFrame);
+        // srand(static_cast<unsigned int>(time(0)));
         applying_connectedComponents(morphologicalFrame, connectedComponent, stats, centroids, save_to_file, currentLabel, featureList);
         
         // cv::imshow("Video", frame);
