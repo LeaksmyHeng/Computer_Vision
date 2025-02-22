@@ -67,8 +67,6 @@ std::vector<ObjectFeature> load_feature_from_csv(const std::string& filename) {
     
         // Read Label
         std::getline(ss, feature.label, ',');
-    
-        // Important: Clear the vector before adding new features
         feature.featureVector.clear();
     
         while (std::getline(ss, token, ',')) {
@@ -76,8 +74,7 @@ std::vector<ObjectFeature> load_feature_from_csv(const std::string& filename) {
             feature.featureVector.push_back(std::stod(token));
             } catch (const std::invalid_argument& e) {
             // Handle the case where a token cannot be converted to a double
-            std::cerr << "Warning: Invalid feature value encountered: " << token << ". Skipping." << std::endl;
-            // You might want to set a default value or take other appropriate action
+            std::cerr << "Invalid feature value encountered: " << token << ". Skipping." << std::endl;
             }
         }
     
@@ -92,6 +89,10 @@ std::vector<ObjectFeature> load_feature_from_csv(const std::string& filename) {
 
 
 vector<vector<double>> extractFeaturesFromFrame(const Mat& frame) {
+    /**
+     * Function to extract the feature from frame. This is used in inferencing.
+     */
+    
     vector<vector<double>> allFeatures;
     
     cv::Mat grayFrame;
@@ -130,7 +131,7 @@ vector<vector<double>> extractFeaturesFromFrame(const Mat& frame) {
             // features.push_back(percentFilled);
             // features.push_back(bboxRatio);
             // features.push_back(angle);
-            std::cout << "Feature vector: " << percentFilled << bboxRatio << angle << std::endl;
+            std::cout << "Feature vector: " << percentFilled << ", " << bboxRatio << ", "<< angle << std::endl;
             vector<double> feature_vector = { percentFilled, bboxRatio, angle };
             allFeatures.push_back(feature_vector);
 
@@ -181,6 +182,9 @@ string classifyObjectWithUnknownDetection(const vector<double>& newFeatureVector
 
 
 vector<double> calculateStandardDeviations(const vector<ObjectFeature>& featureList) {
+    /**
+     * Calculate the standard deviation of all the training feature vectors.
+     */
     size_t featureCount = featureList[0].featureVector.size();
     vector<double> means(featureCount, 0.0);
     vector<double> variances(featureCount, 0.0);
@@ -213,6 +217,10 @@ vector<double> calculateStandardDeviations(const vector<ObjectFeature>& featureL
 }
 
 double setInitialThreshold(const vector<ObjectFeature>& featureList, const vector<double>& stdevs) {
+    /**
+     * Find the appropriate threshold of the features using 3 sigma rules by multiplying each stdev by 3,
+     * sum it all up then divide it with the total number of stdevs
+     */
     // Use 3 standard deviations as an initial threshold
     double threshold = 0.0;
     for (const auto& stddev : stdevs) {
