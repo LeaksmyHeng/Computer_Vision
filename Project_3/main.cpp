@@ -68,10 +68,8 @@ int main(int argc, char *argv[]) {
 
     bool save_to_file = false;
     string currentLabel;
+    vector<ObjectFeature> featureList;
     const std::string outputFilename = "object_features.csv";
-
-    // Load training features from CSV file
-    vector<ObjectFeature> featureList = load_feature_from_csv(outputFilename);
 
     // // Calculate feature statistics
     // FeatureStats featureStats = calculateFeatureStats(featureList);
@@ -136,8 +134,21 @@ int main(int argc, char *argv[]) {
         applying_connectedComponents(morphologicalFrame, connectedComponent, stats, centroids, save_to_file, currentLabel, featureList);
         
          if (showInference) {
-            // Apply classification
-            // apply_classification_to_video(original_frame, featureList, stats, centroids, featureStats, unknownThreshold);
+            // Load features from CSV file
+            vector<ObjectFeature> features_from_csv = load_feature_from_csv(outputFilename);
+            vector<double> standard_deviation = calculateStandardDeviations(features_from_csv);
+            double threshold = setInitialThreshold(features_from_csv, standard_deviation);
+            
+            // // print out the standard deviation of the training features and threshold
+            // for (size_t i = 0; i < standard_deviation.size(); ++i) {
+            //     std::cout << "Standard deviation of feature " << i + 1 << ": " << standard_deviation[i] << std::endl;
+            // }
+            // std::cout << "Threshold is: " << threshold << std::endl;
+            vector<double> features_from_frame = extractFeaturesFromFrame(original_frame);
+            string label = classifyObjectWithUnknownDetection(features_from_frame, features_from_csv, standard_deviation, threshold);
+            std::cout << "Label is " << label << std::endl;
+            // Display the label on the frame
+            putText(original_frame, label, Point(10, 30), FONT_HERSHEY_SIMPLEX, 1, Scalar(0, 255, 0), 2);
             cv::imshow("Inference", original_frame);
         }
         else {

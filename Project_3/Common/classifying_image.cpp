@@ -84,10 +84,64 @@ std::vector<ObjectFeature> load_feature_from_csv(const std::string& filename) {
         featureList.push_back(feature);
     }
 
-    for (const ObjectFeature& obj : featureList) {
-        print_object_feature(obj);
-    }
+    // for (const ObjectFeature& obj : featureList) {
+    //     print_object_feature(obj);
+    // }
     return featureList;
+}
+
+
+vector<double> extractFeaturesFromFrame(const Mat& frame) {
+    vector<double> features;
+    
+    // Convert to grayscale
+    Mat grayFrame;
+    cvtColor(frame, grayFrame, COLOR_BGR2GRAY);
+    
+    // Threshold the image
+    Mat binaryFrame;
+    threshold(grayFrame, binaryFrame, 128, 255, THRESH_BINARY);
+    
+    // Find contours
+    vector<vector<Point>> contours;
+    findContours(binaryFrame, contours, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
+    
+    if (contours.empty()) {
+        std::cout << "Feature not found";
+        return features;
+    }
+    
+    // Find the largest contour (assuming it's the object of interest)
+    int largestContourIdx = 0;
+    double largestArea = 0;
+    for (int i = 0; i < contours.size(); i++) {
+        double area = contourArea(contours[i]);
+        if (area > largestArea) {
+            largestArea = area;
+            largestContourIdx = i;
+        }
+    }
+    
+    // 1. Percent Filled
+    Rect boundingRect = cv::boundingRect(contours[largestContourIdx]);
+    double totalArea = boundingRect.width * boundingRect.height;
+    double percentFilled = largestArea / totalArea;
+    features.push_back(percentFilled);
+    
+    // 2. Bounding Box Ratio
+    double bboxRatio = static_cast<double>(boundingRect.width) / boundingRect.height;
+    features.push_back(bboxRatio);
+    
+    // 3. Axis of Least Central Moment
+    Moments moments = cv::moments(contours[largestContourIdx]);
+    double mu20 = moments.mu20 / moments.m00;
+    double mu02 = moments.mu02 / moments.m00;
+    double mu11 = moments.mu11 / moments.m00;
+    double common = sqrt(4 * mu11 * mu11 + (mu20 - mu02) * (mu20 - mu02));
+    double axisOfLeastCentralMoment = atan2(2 * mu11, mu20 - mu02 + common);
+    features.push_back(axisOfLeastCentralMoment);
+    
+    return features;
 }
 
 
@@ -102,4 +156,91 @@ double compute_scaled_distance(const vector<double> &feature1, const vector<doub
     }
     
     return sqrt(distance);
+}
+
+string classifyObjectWithUnknownDetection(const vector<double>& newFeatureVector, const vector<ObjectFeature>& featureList, const vector<double>& stdevs, double threshold) {
+    double minDistance = numeric_limits<double>::max();
+    string label = "Unknown";
+    for (const ObjectFeature& obj : featureList) {
+        print_object_feature(obj);
+    }
+
+    for (const auto& knownObject : featureList) {
+        double distance = compute_scaled_distance(newFeatureVector, knownObject.featureVector, stdevs);
+        std::cout << "distance: " << distance << "minDsitance: " << minDistance << std::endl;
+        if (distance < minDistance) {
+            minDistance = distance;
+            label = knownObject.label;
+        }
+    }
+
+    // If the minimum distance is greater than the threshold, classify as "Unknown"
+    if (minDistance > threshold) {
+        label = "Unknown";
+    }
+
+    return label;
+}
+
+
+vector<double> calculateStandardDeviations(const vector<ObjectFeature>& featureList) {
+    size_t featureCount = featureList[0].featureVector.size();
+    vector<double> means(featureCount, 0.0);
+    vector<double> variances(featureCount, 0.0);
+    vector<double> stdevs(featureCount, 0.0);
+    
+    // Calculate means
+    for (const auto& object : featureList) {
+        for (size_t i = 0; i < featureCount; ++i) {
+            means[i] += object.featureVector[i];
+        }
+    }
+    for (auto& mean : means) {
+        mean /= featureList.size();
+    }
+    
+    // Calculate variances
+    for (const auto& object : featureList) {
+        for (size_t i = 0; i < featureCount; ++i) {
+            double diff = object.featureVector[i] - means[i];
+            variances[i] += diff * diff;
+        }
+    }
+    
+    // Calculate standard deviations
+    for (size_t i = 0; i < featureCount; ++i) {
+        stdevs[i] = sqrt(variances[i] / (featureList.size() - 1));
+    }
+    
+    return stdevs;
+}
+
+double setInitialThreshold(const vector<ObjectFeature>& featureList, const vector<double>& stdevs) {
+    // Use 3 standard deviations as an initial threshold
+    double threshold = 0.0;
+    for (const auto& stddev : stdevs) {
+        threshold += 3 * stddev;
+    }
+    threshold /= stdevs.size();
+    return threshold;
+}
+
+
+void processVideoStream(VideoCapture& cap, const vector<ObjectFeature>& featureList, const vector<double>& stdevs, double threshold) {
+    Mat frame;
+    while (cap.read(frame)) {
+        // Extract features from the current frame
+        vector<double> currentFeatures = extractFeaturesFromFrame(frame);
+        
+        if (!currentFeatures.empty()) {
+            // Classify the object
+            string label = classifyObjectWithUnknownDetection(currentFeatures, featureList, stdevs, threshold);
+            
+            // Display the label on the frame
+            putText(frame, label, Point(10, 30), FONT_HERSHEY_SIMPLEX, 1, Scalar(0, 255, 0), 2);
+        }
+        
+        imshow("Object Recognition", frame);
+        // if (waitKey(1) == 27) break; // Exit on ESC key
+    }
 }

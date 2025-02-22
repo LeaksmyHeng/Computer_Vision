@@ -175,11 +175,11 @@ void applying_feature_region(cv::Mat &src, cv::Mat &dst, cv::Mat &stats, cv::Mat
         std::cout << "Feature vector saved for region ID: " << regionId << std::endl;
     }
 
-    // Display the calculated features
-    std::cout << "Region " << regionId << " Features:" << std::endl;
-    std::cout << "  Percent Filled: " << percentFilled << "%" << std::endl;
-    std::cout << "  Bounding Box Ratio (Height/Width): " << bboxRatio << std::endl;
-    std::cout << "  Orientation Angle (Axis of Least Central Moment): " << angle << " radians" << std::endl;
+    // // Display the calculated features
+    // std::cout << "Region " << regionId << " Features:" << std::endl;
+    // std::cout << "  Percent Filled: " << percentFilled << "%" << std::endl;
+    // std::cout << "  Bounding Box Ratio (Height/Width): " << bboxRatio << std::endl;
+    // std::cout << "  Orientation Angle (Axis of Least Central Moment): " << angle << " radians" << std::endl;
 }
 
 
