@@ -130,6 +130,7 @@ vector<vector<double>> extractFeaturesFromFrame(const Mat& frame) {
             // features.push_back(percentFilled);
             // features.push_back(bboxRatio);
             // features.push_back(angle);
+            std::cout << "Feature vector: " << percentFilled << bboxRatio << angle << std::endl;
             vector<double> feature_vector = { percentFilled, bboxRatio, angle };
             allFeatures.push_back(feature_vector);
 
@@ -156,13 +157,14 @@ double compute_scaled_distance(const vector<double> &feature1, const vector<doub
 string classifyObjectWithUnknownDetection(const vector<double>& newFeatureVector, const vector<ObjectFeature>& featureList, const vector<double>& stdevs, double threshold) {
     double minDistance = numeric_limits<double>::max();
     string label = "Unknown";
-    for (const ObjectFeature& obj : featureList) {
-        print_object_feature(obj);
-    }
+    // // to verify that we do have feature list
+    // for (const ObjectFeature& obj : featureList) {
+    //     print_object_feature(obj);
+    // }
 
     for (const auto& knownObject : featureList) {
         double distance = compute_scaled_distance(newFeatureVector, knownObject.featureVector, stdevs);
-        std::cout << "distance: " << distance << "minDsitance: " << minDistance << std::endl;
+        // std::cout << "distance: " << distance << "minDsitance: " << minDistance << std::endl;
         if (distance < minDistance) {
             minDistance = distance;
             label = knownObject.label;
