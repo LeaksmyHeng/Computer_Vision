@@ -9,7 +9,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
 
-add_executable(project_3 main.cpp Common/thresholding.cpp Common/morphological.cpp Common/segmentation.cpp)
+add_executable(project_3 main.cpp Common/thresholding.cpp Common/morphological.cpp Common/segmentation.cpp Common/classifying_image.cpp)
 target_link_libraries(project_3 ${OpenCV_LIBS})
 
 include(CTest)
