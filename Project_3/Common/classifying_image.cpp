@@ -91,3 +91,15 @@ std::vector<ObjectFeature> load_feature_from_csv(const std::string& filename) {
 }
 
 
+double compute_scaled_distance(const vector<double> &feature1, const vector<double> &feature2, const vector<double> &stdev) {
+    /**
+     * Function to compute euclidian distance between two feature.
+     */
+    double distance = 0.0;
+    for (size_t i = 0; i < feature1.size(); ++i) {
+        double diff = (feature1[i] - feature2[i]) / stdev[i];
+        distance += diff * diff;
+    }
+    
+    return sqrt(distance);
+}

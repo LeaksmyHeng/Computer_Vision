@@ -17,6 +17,20 @@ all in one for loop (for loop that is used to go through the images in the datab
 #include "Common_Header/thresholding.h"
 #include "Common_Header/morphological.h"
 #include "Common_Header/segmentation.h"
+
+using namespace cv;
+using namespace std;
+namespace fs = std::filesystem;
+
+
+#include <opencv2/opencv.hpp>
+#include <iostream>
+#include <filesystem>
+#include <fstream>
+
+#include "Common_Header/thresholding.h"
+#include "Common_Header/morphological.h"
+#include "Common_Header/segmentation.h"
 #include "Common_Header/classifying_image.h"
 
 using namespace cv;
@@ -54,11 +68,18 @@ int main(int argc, char *argv[]) {
 
     bool save_to_file = false;
     string currentLabel;
-    vector<ObjectFeature> featureList;
     const std::string outputFilename = "object_features.csv";
+
+    // Load training features from CSV file
+    vector<ObjectFeature> featureList = load_feature_from_csv(outputFilename);
+
+    // // Calculate feature statistics
+    // FeatureStats featureStats = calculateFeatureStats(featureList);
 
     // Set the threshold for unknown object detection
     double unknownThreshold = 2.0;
+
+    bool showInference = false; // Add a flag to control Inference display
 
     while (true) {
         *capdev >> frame;
@@ -66,8 +87,8 @@ int main(int argc, char *argv[]) {
             printf("frame is empty\n");
             break;
         }
-        cv::Mat originalFrame = frame.clone();
-        // cv::imshow("frame", frame);
+        cv::Mat original_frame = frame.clone();
+        //cv::imshow("frame", frame);
         char key = cv::waitKey(10);
         if (key == 'q' || key == 'Q') {
             save_features_to_csv(featureList, outputFilename);
@@ -93,11 +114,9 @@ int main(int argc, char *argv[]) {
             featureList.clear();                                    // clear the struct
             
         }
-        else if (key == 'i') {
-            // load features from output_feature.csv
-            std::vector<ObjectFeature> featureList = load_feature_from_csv(outputFilename);
-            // apply_classification_to_video(originalFrame, featureList, stats, centroids, featureStats, unknownThreshold);
-            cv::imshow("inference", originalFrame);
+        else if (key == 'i' || key == 'I') {
+            // apply_classification_to_video(original_frame, featureList, stats, centroids);
+            showInference = !showInference;  // Toggle the flag
         }
         else {
             save_to_file = false; // Normal mode, no feature saving
@@ -116,10 +135,14 @@ int main(int argc, char *argv[]) {
         // srand(static_cast<unsigned int>(time(0)));
         applying_connectedComponents(morphologicalFrame, connectedComponent, stats, centroids, save_to_file, currentLabel, featureList);
         
-        cv::imshow("Video", frame);
-        // cv::imshow("Thresholding", grayFrame);
-        // cv::imshow("Morphological", morphologicalFrame);
-        // cv::imshow("inference", originalFrame);
+         if (showInference) {
+            // Apply classification
+            // apply_classification_to_video(original_frame, featureList, stats, centroids, featureStats, unknownThreshold);
+            cv::imshow("Inference", original_frame);
+        }
+        else {
+            cv::imshow("Video", original_frame);
+        }
 
         
         // i received an error on Error: Assertion failed (src_depth != CV_16F && src_depth != CV_32S) in convertToShow
