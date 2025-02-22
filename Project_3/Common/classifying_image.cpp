@@ -91,57 +91,52 @@ std::vector<ObjectFeature> load_feature_from_csv(const std::string& filename) {
 }
 
 
-vector<double> extractFeaturesFromFrame(const Mat& frame) {
-    vector<double> features;
+vector<vector<double>> extractFeaturesFromFrame(const Mat& frame) {
+    vector<vector<double>> allFeatures;
     
-    // Convert to grayscale
-    Mat grayFrame;
-    cvtColor(frame, grayFrame, COLOR_BGR2GRAY);
+    cv::Mat grayFrame;
+    cv::Mat binaryFrame;
+
+    GaussianBlur(frame, grayFrame, Size(5, 5), 0);
+    cv::cvtColor(grayFrame, grayFrame, cv::COLOR_BGR2GRAY);
+    // cv::threshold(frame, grayFrame, 125, 255, cv::THRESH_BINARY);
+    cv::threshold(grayFrame, binaryFrame, 127, 255, cv::THRESH_BINARY_INV);
     
-    // Threshold the image
-    Mat binaryFrame;
-    threshold(grayFrame, binaryFrame, 128, 255, THRESH_BINARY);
-    
-    // Find contours
-    vector<vector<Point>> contours;
-    findContours(binaryFrame, contours, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
-    
-    if (contours.empty()) {
-        std::cout << "Feature not found";
-        return features;
-    }
-    
-    // Find the largest contour (assuming it's the object of interest)
-    int largestContourIdx = 0;
-    double largestArea = 0;
-    for (int i = 0; i < contours.size(); i++) {
-        double area = contourArea(contours[i]);
-        if (area > largestArea) {
-            largestArea = area;
-            largestContourIdx = i;
+    cv::Mat labels, stats, centroids;
+    int result = cv::connectedComponentsWithStats(binaryFrame, labels, stats, centroids);
+    cv::cvtColor(binaryFrame, binaryFrame, cv::COLOR_GRAY2BGR);
+
+    for (int i = 1; i < result; i++) {
+        int x = stats.at<int>(i, cv::CC_STAT_LEFT);
+        int y = stats.at<int>(i, cv::CC_STAT_TOP);
+        int w = stats.at<int>(i, cv::CC_STAT_WIDTH);
+        int h = stats.at<int>(i, cv::CC_STAT_HEIGHT);
+
+        // ignore small region
+        if (x > 50 && y > 50) {
+            cv::Mat region = grayFrame(cv::Rect(x, y, w, h));
+            cv::Point2f centroid = cv::Point2f(centroids.at<double>(i, 0), centroids.at<double>(i, 1));
+            // Calculate moments for the region (second-order moments)
+            cv::Moments moments = cv::moments(region, true);
+            // calculating axis of least central moment
+            double angle = 0.5 * std::atan2(2 * moments.mu11, moments.mu02 - moments.mu20);
+            // Calculate percent filled
+            double area = moments.m00;  // Central moment m00 is the area of the region
+            double boundingBoxArea = w * h;
+            double percentFilled = (area / boundingBoxArea) * 100;
+
+            // Bounding box height/width ratio
+            double bboxRatio = static_cast<double>(h) / static_cast<double>(w);
+            // features.push_back(percentFilled);
+            // features.push_back(bboxRatio);
+            // features.push_back(angle);
+            vector<double> feature_vector = { percentFilled, bboxRatio, angle };
+            allFeatures.push_back(feature_vector);
+
+            cv::rectangle(frame, cv::Point(x, y), cv::Point(x + w, y + h), cv::Scalar(0, 255, 0), 2);
         }
     }
-    
-    // 1. Percent Filled
-    Rect boundingRect = cv::boundingRect(contours[largestContourIdx]);
-    double totalArea = boundingRect.width * boundingRect.height;
-    double percentFilled = largestArea / totalArea;
-    features.push_back(percentFilled);
-    
-    // 2. Bounding Box Ratio
-    double bboxRatio = static_cast<double>(boundingRect.width) / boundingRect.height;
-    features.push_back(bboxRatio);
-    
-    // 3. Axis of Least Central Moment
-    Moments moments = cv::moments(contours[largestContourIdx]);
-    double mu20 = moments.mu20 / moments.m00;
-    double mu02 = moments.mu02 / moments.m00;
-    double mu11 = moments.mu11 / moments.m00;
-    double common = sqrt(4 * mu11 * mu11 + (mu20 - mu02) * (mu20 - mu02));
-    double axisOfLeastCentralMoment = atan2(2 * mu11, mu20 - mu02 + common);
-    features.push_back(axisOfLeastCentralMoment);
-    
-    return features;
+    return allFeatures;
 }
 
 
@@ -223,24 +218,4 @@ double setInitialThreshold(const vector<ObjectFeature>& featureList, const vecto
     }
     threshold /= stdevs.size();
     return threshold;
-}
-
-
-void processVideoStream(VideoCapture& cap, const vector<ObjectFeature>& featureList, const vector<double>& stdevs, double threshold) {
-    Mat frame;
-    while (cap.read(frame)) {
-        // Extract features from the current frame
-        vector<double> currentFeatures = extractFeaturesFromFrame(frame);
-        
-        if (!currentFeatures.empty()) {
-            // Classify the object
-            string label = classifyObjectWithUnknownDetection(currentFeatures, featureList, stdevs, threshold);
-            
-            // Display the label on the frame
-            putText(frame, label, Point(10, 30), FONT_HERSHEY_SIMPLEX, 1, Scalar(0, 255, 0), 2);
-        }
-        
-        imshow("Object Recognition", frame);
-        // if (waitKey(1) == 27) break; // Exit on ESC key
-    }
 }

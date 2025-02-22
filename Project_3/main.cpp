@@ -74,9 +74,6 @@ int main(int argc, char *argv[]) {
     // // Calculate feature statistics
     // FeatureStats featureStats = calculateFeatureStats(featureList);
 
-    // Set the threshold for unknown object detection
-    double unknownThreshold = 2.0;
-
     bool showInference = false; // Add a flag to control Inference display
 
     while (true) {
@@ -143,12 +140,19 @@ int main(int argc, char *argv[]) {
             // for (size_t i = 0; i < standard_deviation.size(); ++i) {
             //     std::cout << "Standard deviation of feature " << i + 1 << ": " << standard_deviation[i] << std::endl;
             // }
-            // std::cout << "Threshold is: " << threshold << std::endl;
-            vector<double> features_from_frame = extractFeaturesFromFrame(original_frame);
-            string label = classifyObjectWithUnknownDetection(features_from_frame, features_from_csv, standard_deviation, threshold);
-            std::cout << "Label is " << label << std::endl;
-            // Display the label on the frame
-            putText(original_frame, label, Point(10, 30), FONT_HERSHEY_SIMPLEX, 1, Scalar(0, 255, 0), 2);
+            std::cout << "Threshold is: " << threshold << std::endl;
+            vector<vector<double>> features_from_frame = extractFeaturesFromFrame(original_frame);
+            // string label = classifyObjectWithUnknownDetection(features_from_frame, features_from_csv, standard_deviation, threshold);
+            for (const auto& feature_vector : features_from_frame) {
+                
+                string label = classifyObjectWithUnknownDetection(feature_vector, features_from_csv, standard_deviation, 2.0);
+                std::cout << "Label is " << label << std::endl;
+                // Display the label on the frame (you might want to adjust the position for each object)
+                putText(original_frame, label, Point(10, 30), FONT_HERSHEY_SIMPLEX, 1, Scalar(0, 255, 0), 2);
+            }
+            
+            // // Display the label on the frame
+            // putText(original_frame, label, Point(10, 30), FONT_HERSHEY_SIMPLEX, 1, Scalar(0, 255, 0), 2);
             cv::imshow("Inference", original_frame);
         }
         else {
