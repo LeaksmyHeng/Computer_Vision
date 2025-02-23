@@ -144,9 +144,9 @@ int main(int argc, char *argv[]) {
             vector<vector<double>> features_from_frame = extractFeaturesFromFrame(original_frame);
             for (const auto& feature_vector : features_from_frame) {
                 // // classifying using euclidean
-                // string label = classifyObjectWithUnknownDetection(feature_vector, features_from_csv, standard_deviation, threshold);
+                string label = classifyObjectWithUnknownDetection(feature_vector, features_from_csv, standard_deviation, threshold);
                 // classifying using knn
-                string label = classifyObjectUsingKNN(feature_vector, features_from_csv, standard_deviation);
+                // string label = classifyObjectUsingKNN(feature_vector, features_from_csv, standard_deviation);
 
                 // std::cout << "Label is " << label << std::endl;
                 // Display the label on the frame (you might want to adjust the position for each object)
