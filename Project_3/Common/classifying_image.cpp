@@ -155,29 +155,17 @@ double compute_scaled_distance(const vector<double> &feature1, const vector<doub
     return sqrt(distance);
 }
 
-string classifyObjectWithUnknownDetection(const vector<double>& newFeatureVector, const vector<ObjectFeature>& featureList, const vector<double>& stdevs, double threshold) {
-    double minDistance = numeric_limits<double>::max();
-    string label = "Unknown";
-    // // to verify that we do have feature list
-    // for (const ObjectFeature& obj : featureList) {
-    //     print_object_feature(obj);
-    // }
 
-    for (const auto& knownObject : featureList) {
-        double distance = compute_scaled_distance(newFeatureVector, knownObject.featureVector, stdevs);
-        // std::cout << "distance: " << distance << "minDsitance: " << minDistance << std::endl;
-        if (distance < minDistance) {
-            minDistance = distance;
-            label = knownObject.label;
-        }
+double euclidean_distance(const std::vector<double>& a, const std::vector<double>& b) {
+    /**
+     * Regular euclidean distance.
+     */
+    double sum = 0.0;
+    for (size_t i = 0; i < a.size(); ++i) {
+        double diff = a[i] - b[i];
+        sum += diff * diff;
     }
-
-    // If the minimum distance is greater than the threshold, classify as "Unknown"
-    if (minDistance > threshold) {
-        label = "Unknown";
-    }
-
-    return label;
+    return std::sqrt(sum);
 }
 
 
@@ -216,6 +204,7 @@ vector<double> calculateStandardDeviations(const vector<ObjectFeature>& featureL
     return stdevs;
 }
 
+
 double setInitialThreshold(const vector<ObjectFeature>& featureList, const vector<double>& stdevs) {
     /**
      * Find the appropriate threshold of the features using 3 sigma rules by multiplying each stdev by 3,
@@ -228,4 +217,80 @@ double setInitialThreshold(const vector<ObjectFeature>& featureList, const vecto
     }
     threshold /= stdevs.size();
     return threshold;
+}
+
+
+string classifyObjectWithUnknownDetection(const vector<double>& newFeatureVector, const vector<ObjectFeature>& featureList, const vector<double>& stdevs, double threshold) {
+    /**
+     * Function to classifying the object in the frame.
+     */
+    double minDistance = numeric_limits<double>::max();
+    string label = "Unknown";
+    // // to verify that we do have feature list
+    // for (const ObjectFeature& obj : featureList) {
+    //     print_object_feature(obj);
+    // }
+
+    for (const auto& knownObject : featureList) {
+        double distance = compute_scaled_distance(newFeatureVector, knownObject.featureVector, stdevs);
+        // std::cout << "distance: " << distance << "minDsitance: " << minDistance << std::endl;
+        if (distance < minDistance) {
+            minDistance = distance;
+            label = knownObject.label;
+        }
+    }
+
+    // If the minimum distance is greater than the threshold, classify as "Unknown"
+    if (minDistance > threshold) {
+        label = "Unknown";
+    }
+
+    return label;
+}
+
+
+string classifyObjectUsingKNN(const vector<double>& newFeatureVector, const vector<ObjectFeature>& featureList, const vector<double>& stdevs) {
+    /**
+     * Function to use knn to classify the object.
+     */
+    string label = "Unknown";
+    int k = 3;  // Number of nearest neighbors to consider
+
+    // calculate distances to all objects in the training set
+    vector<pair<double, ObjectFeature>> distances;
+    for (const auto& knownObject : featureList) {
+        double dist = compute_scaled_distance(newFeatureVector, knownObject.featureVector, stdevs);
+        distances.push_back(make_pair(dist, knownObject));  // Store distance along with ObjectFeature
+    }
+
+    // sort distances in ascending order (smallest distance comes first)
+    sort(distances.begin(), distances.end(), [](const pair<double, ObjectFeature>& a, const pair<double, ObjectFeature>& b) {
+        return a.first < b.first;
+    });
+
+    // compute the average feature vector of the K nearest neighbors
+    vector<double> avgFeatureVector(newFeatureVector.size(), 0.0);
+    for (int i = 0; i < k; ++i) {
+        const auto& neighbor = distances[i].second;
+        for (size_t j = 0; j < neighbor.featureVector.size(); ++j) {
+            avgFeatureVector[j] += neighbor.featureVector[j];  // Accumulate feature values
+        }
+    }
+
+    // average the features
+    for (size_t i = 0; i < avgFeatureVector.size(); ++i) {
+        avgFeatureVector[i] /= k;  // Divide by K to get the average
+    }
+
+    // find the label of the nearest neighbor whose feature vector that is closest to the average feature vector
+    double minDistance = DBL_MAX;
+    for (const auto& knownObject : featureList) {
+        double dist = compute_scaled_distance(avgFeatureVector, knownObject.featureVector, stdevs);
+        if (dist < minDistance) {
+            minDistance = dist;
+            label = knownObject.label;
+        }
+    }
+
+    return label;
 }

@@ -19,8 +19,9 @@ struct FeatureStats {
 };
 std::vector<ObjectFeature> load_feature_from_csv(const std::string& filename);
 vector<vector<double>> extractFeaturesFromFrame(const Mat& frame);
-string classifyObjectWithUnknownDetection(const vector<double>& newFeatureVector, const vector<ObjectFeature>& featureList, const vector<double>& stdevs, double threshold);
 vector<double> calculateStandardDeviations(const vector<ObjectFeature>& featureList);
 double setInitialThreshold(const vector<ObjectFeature>& featureList, const vector<double>& stdevs);
+string classifyObjectWithUnknownDetection(const vector<double>& newFeatureVector, const vector<ObjectFeature>& featureList, const vector<double>& stdevs, double threshold);
+string classifyObjectUsingKNN(const vector<double>& newFeatureVector, const vector<ObjectFeature>& featureList, const vector<double>& stdevs);
 
 #endif // CLASSIFICATION_H

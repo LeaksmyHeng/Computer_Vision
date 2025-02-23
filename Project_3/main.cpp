@@ -1,11 +1,11 @@
 /* 
 Leaksmy Heng
 CS5330
-Feb 07, 2025
-Project2
-This is the pipeline of the program
-I implemented step 1 where i call the feature function and distance method function
-all in one for loop (for loop that is used to go through the images in the database file)
+Feb 22, 2025
+Project3
+This is the pipeline of the program.
+Press i will turn the program to inferencing mode
+Press n will turn the program to training mode. Users will be prompted to label the image.
 */
 
 
@@ -142,10 +142,12 @@ int main(int argc, char *argv[]) {
             // }
             // std::cout << "Threshold is: " << threshold << std::endl;
             vector<vector<double>> features_from_frame = extractFeaturesFromFrame(original_frame);
-            // string label = classifyObjectWithUnknownDetection(features_from_frame, features_from_csv, standard_deviation, threshold);
             for (const auto& feature_vector : features_from_frame) {
-                
-                string label = classifyObjectWithUnknownDetection(feature_vector, features_from_csv, standard_deviation, threshold);
+                // // classifying using euclidean
+                // string label = classifyObjectWithUnknownDetection(feature_vector, features_from_csv, standard_deviation, threshold);
+                // classifying using knn
+                string label = classifyObjectUsingKNN(feature_vector, features_from_csv, standard_deviation);
+
                 // std::cout << "Label is " << label << std::endl;
                 // Display the label on the frame (you might want to adjust the position for each object)
                 putText(original_frame, label, Point(10, 30), FONT_HERSHEY_SIMPLEX, 1, Scalar(0, 255, 0), 2);
