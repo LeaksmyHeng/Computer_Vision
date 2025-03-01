@@ -11,6 +11,9 @@ Press n will turn the program to training mode. Users will be prompted to label 
 
 #include <opencv2/opencv.hpp>
 
+#include "Utils_header/image_detection.h"
+
+
 using namespace cv;
 
 
@@ -50,7 +53,8 @@ int main(int argc, char *argv[]) {
             break;
         }
         
-        
+        // call the chess board corner detection
+        checkboard_corner_detection(frame);
         cv::imshow("Video", frame);
     }
     delete capdev;

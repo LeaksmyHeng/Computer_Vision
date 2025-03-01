@@ -9,7 +9,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
 
-add_executable(project_4 main.cpp)
+add_executable(project_4 main.cpp Utils/image_detection.cpp)
 target_link_libraries(project_4 ${OpenCV_LIBS})
 
 include(CTest)
