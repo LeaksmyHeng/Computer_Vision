@@ -12,6 +12,7 @@ Press n will turn the program to training mode. Users will be prompted to label 
 #include <opencv2/opencv.hpp>
 
 #include "Utils_header/image_detection.h"
+#include "Utils_header/utils.h"
 
 
 using namespace cv;
@@ -40,6 +41,16 @@ int main(int argc, char *argv[]) {
     cv::namedWindow("Video", 1); // identifies a window
     cv::Mat frame;
 
+    // pattern size of the chessboard specified in the instruction
+    cv::Size patternsize(9,6);
+    // boolean to store the vector of corners
+    bool vector_corners_save = false;
+
+    // hold the 3D coordinates of each corner in world space
+    std::vector<cv::Vec3f> point_set;
+    std::vector<std::vector<cv::Vec3f> > point_list;
+    std::vector<std::vector<cv::Point2f> > corner_list;
+
     while (true) {
         *capdev >> frame;
         if( frame.empty() ) {
@@ -52,9 +63,32 @@ int main(int argc, char *argv[]) {
             printf("Quitting the program\n");
             break;
         }
-        
+        else if (key == 's' || key == 'S') {
+            printf("Store the vector of corners found by the last successful target detection into a corner_list.\n");
+            vector_corners_save = true;
+            // get image from Image directory and test that it was capture and display correctly.
+            String path = "C:/Users/Leaksmy Heng/Documents/GitHub/CS5330/Computer_Vision/Project_4/Image/grayscale_latest_output_image.png";
+            cv::Mat latest_image = cv::imread(path, IMREAD_GRAYSCALE);
+            cv::imshow("image", latest_image);
+
+            calibration_image_selection(latest_image, patternsize, vector_corners_save, point_set, point_list, corner_list);
+
+            // delete the image and stored it in the Image/calibration folder
+            // we can then check in the folder to see how many images we have for part 3 later
+            std::time_t epoch_time = std::time(nullptr);
+            std::time_t currentTime = std::time(0); // Get current epoch time
+            std::string epochString = std::to_string(currentTime); // Convert epoch time to string
+            std::string directory = "C:/Users/Leaksmy Heng/Documents/GitHub/CS5330/Computer_Vision/Project_4/Image/Calibrated_images/";
+            std::string img = "grayscale_latest_output_image.png";
+            std::string dest = directory + epochString + img;
+            bool copy_image = copyFile(path, dest);
+            if (copy_image) {
+                std::cout << "Copy file successfully" << std::endl;
+            }
+        }
+
         // call the chess board corner detection
-        checkboard_corner_detection(frame);
+        checkboard_corner_detection(frame, patternsize);
         cv::imshow("Video", frame);
     }
     delete capdev;
