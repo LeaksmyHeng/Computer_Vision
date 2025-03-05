@@ -26,3 +26,15 @@ bool copyFile(const std::string& source, const std::string& destination) {
     }
 }
 
+
+bool deleteFile(const std::string& source) {
+    /**
+     * Function to delete file.
+     */
+    int status = remove("myfile.txt");
+    // Check if the file has been successfully removed
+    if (status != 0) {
+        return false;
+    }
+    return true;
+}

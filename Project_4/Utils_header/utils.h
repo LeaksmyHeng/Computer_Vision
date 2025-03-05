@@ -9,5 +9,6 @@
 #define UTILS_H
 
 bool copyFile(const std::string& source, const std::string& destination);
+bool deleteFile(const std::string& source);
 
 #endif // UTILS_H

@@ -79,11 +79,15 @@ int main(int argc, char *argv[]) {
             std::time_t currentTime = std::time(0); // Get current epoch time
             std::string epochString = std::to_string(currentTime); // Convert epoch time to string
             std::string directory = "C:/Users/Leaksmy Heng/Documents/GitHub/CS5330/Computer_Vision/Project_4/Image/Calibrated_images/";
-            std::string img = "grayscale_latest_output_image.png";
+            std::string img = "_grayscale_latest_output_image.png";
             std::string dest = directory + epochString + img;
             bool copy_image = copyFile(path, dest);
             if (copy_image) {
                 std::cout << "Copy file successfully" << std::endl;
+                bool delete_file = deleteFile(path);
+                if (delete_file) {
+                    std::cout << "delete file successfully" << std::endl;
+                }
             }
         }
 
