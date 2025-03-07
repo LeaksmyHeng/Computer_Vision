@@ -38,3 +38,17 @@ bool deleteFile(const std::string& source) {
     }
     return true;
 }
+
+
+int count_png_file(const std::string& directory) {
+    /**
+     * Function to count total number of png file in a specified directory.
+     */
+    int total = 0;
+    for (const auto& entry : std::filesystem::directory_iterator(directory)) {
+        if (entry.is_regular_file() && entry.path().extension() == ".png") {
+            total += 1;
+        }
+    }
+    return total;
+}

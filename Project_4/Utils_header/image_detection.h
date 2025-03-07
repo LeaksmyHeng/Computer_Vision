@@ -33,4 +33,18 @@ void calibration_image_selection(cv::Mat &latest_image,
 );
 
 
+/**
+ * When users press "C" or "c", the images in the calibrated_images folder will get calibrated.
+ * This is only executed if there are at least 5 images used to calibrate.
+ */
+double camera_calibration(int number_of_calibrated_images,
+    int count_png_images, 
+    const std::string& directory, 
+    cv::Size patternsize, 
+    std::vector<cv::Vec3f> point_set, 
+    std::vector<std::vector<cv::Vec3f>> point_list, 
+    std::vector<std::vector<cv::Point2f>> corner_list
+);
+
+
 #endif // CHESSBOARD_CORNER_DETECTION_H

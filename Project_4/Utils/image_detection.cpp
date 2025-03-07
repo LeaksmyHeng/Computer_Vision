@@ -7,6 +7,10 @@ This is for the first task where we have to detect and extract target corners
 */
 
 #include <opencv2/opencv.hpp>
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <filesystem>
 
 using namespace cv;
 
@@ -100,4 +104,36 @@ void calibration_image_selection(cv::Mat &latest_image, cv::Size patternsize, bo
     // }
     corner_list.push_back(corners);
     point_list.push_back(point_set);
+}
+
+
+double camera_calibration(int number_of_calibrated_images, int count_png_images, const std::string& directory, cv::Size patternsize, std::vector<cv::Vec3f> point_set, std::vector<std::vector<cv::Vec3f>> point_list, std::vector<std::vector<cv::Point2f>> corner_list) {
+    /**
+     * Function for task3 calibrate the camera.
+     */
+
+    // if the number of calibrated image is less than 5, that means this is based on the count_png_images
+    // in the folder. So loop thrugh each images and stored those in the other vectors.
+                
+    if ((number_of_calibrated_images >= 5) | (count_png_images >= 5)) {
+        std::cout << "Allow to calibrate" << std::endl;
+        std::vector<cv::Mat> rvecs, tvecs;
+        if (number_of_calibrated_images < 5) {
+            std::vector<std::string> png_files;
+            for (const auto& entry : std::filesystem::directory_iterator(directory)) {
+                if (entry.is_regular_file() && entry.path().extension() == ".png") {
+                    std::cout << entry.path().string() << std::endl;
+                    cv::Mat image = cv::imread(entry.path().string(), IMREAD_GRAYSCALE);
+                    calibration_image_selection(image, patternsize, false, point_set, point_list, corner_list);
+                }
+            }
+        }
+
+        // double calibrate_camera = cv::calibrateCamera(point_list)
+    }
+    else {
+        std::cout << "Not allow to calibrate. Please save more frame.\n" << std::endl;
+    }
+
+    return 0.0;
 }

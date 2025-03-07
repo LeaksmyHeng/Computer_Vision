@@ -51,6 +51,9 @@ int main(int argc, char *argv[]) {
     std::vector<std::vector<cv::Vec3f> > point_list;
     std::vector<std::vector<cv::Point2f> > corner_list;
 
+    // store how many calibrated image we have
+    int number_of_calibrated_images = 0;
+
     while (true) {
         *capdev >> frame;
         if( frame.empty() ) {
@@ -89,6 +92,18 @@ int main(int argc, char *argv[]) {
                     std::cout << "delete file successfully" << std::endl;
                 }
             }
+
+            // increment the number of calibrated image
+            number_of_calibrated_images += 1;
+        }
+        // if users press c or C, calibrate the image if possible
+        else if (key == 'c' || key == 'C') {
+            // if this is less than 5, check the folders to see if there are at least 5 png file in there, if it is,
+            // we can call calibration_image_selection
+            std::string directory = "C:/Users/Leaksmy Heng/Documents/GitHub/CS5330/Computer_Vision/Project_4/Image/Calibrated_Images/";
+            int count_png_images = count_png_file(directory); 
+            double camera_cal = camera_calibration(number_of_calibrated_images, count_png_images, directory, patternsize, point_set, point_list, corner_list);
+            
         }
 
         // call the chess board corner detection
