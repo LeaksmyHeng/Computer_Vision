@@ -40,6 +40,7 @@ int main(int argc, char *argv[]) {
 
     cv::namedWindow("Video", 1); // identifies a window
     cv::Mat frame;
+    cv::Size imageSize = frame.size();
 
     // pattern size of the chessboard specified in the instruction
     cv::Size patternsize(9,6);
@@ -53,6 +54,18 @@ int main(int argc, char *argv[]) {
 
     // store how many calibrated image we have
     int number_of_calibrated_images = 0;
+
+    // as per task3 instruction
+    // make the camera matrix 3x3 cv::Mat of type CV_64FC1
+    // initialized all elements to 0 and alter it later
+    cv::Mat camera_matrix = cv::Mat(3, 3, CV_64FC1, cv::Scalar(0.0));
+    camera_matrix.at<double>(0, 0) = 1.0;
+    camera_matrix.at<double>(1, 1) = 1.0;
+    camera_matrix.at<double>(2, 2) = 1.0;
+    camera_matrix.at<double>(0, 2) = frame.cols/2.0;
+    camera_matrix.at<double>(1, 2) = frame.rows/2.0;
+
+    std::vector<double> distortion_coefficients;
 
     while (true) {
         *capdev >> frame;
@@ -102,8 +115,22 @@ int main(int argc, char *argv[]) {
             // we can call calibration_image_selection
             std::string directory = "C:/Users/Leaksmy Heng/Documents/GitHub/CS5330/Computer_Vision/Project_4/Image/Calibrated_Images/";
             int count_png_images = count_png_file(directory); 
-            double camera_cal = camera_calibration(number_of_calibrated_images, count_png_images, directory, patternsize, point_set, point_list, corner_list);
+
+            std::vector<cv::Mat> rotations, translations;
             
+            double camera_cal = camera_calibration(
+                number_of_calibrated_images, 
+                count_png_images, 
+                directory,
+                patternsize,
+                point_set, 
+                point_list, 
+                corner_list,
+                camera_matrix,
+                distortion_coefficients,
+                rotations,
+                translations);
+
         }
 
         // call the chess board corner detection

@@ -71,7 +71,7 @@ void checkboard_corner_detection(cv::Mat &frame, cv::Size patternsize) {
 }
 
 
-void calibration_image_selection(cv::Mat &latest_image, cv::Size patternsize, bool save_vector_corners, std::vector<cv::Vec3f> point_set, std::vector<std::vector<cv::Vec3f>> point_list, std::vector<std::vector<cv::Point2f>> corner_list) {
+void calibration_image_selection(cv::Mat &latest_image, cv::Size patternsize, bool save_vector_corners, std::vector<cv::Vec3f> &point_set, std::vector<std::vector<cv::Vec3f>> &point_list, std::vector<std::vector<cv::Point2f>> &corner_list) {
 /**
  * Function to select calibration image.
  */
@@ -79,6 +79,7 @@ void calibration_image_selection(cv::Mat &latest_image, cv::Size patternsize, bo
     // therefore loop through the patternsize
     // I'll just measure  the world in units of target squares
     // therefore, I won't multiple j and i with the size of the square cause just assume each one is 1 unit
+    point_set.clear();
     for (int i = 0; i < patternsize.height; i++) {
         for (int j = 0; j < patternsize.width; j++) {
             // std::cout << "i, j, z coordinate is " << j << ", " << i << ", " << 0 << std::endl;
@@ -91,45 +92,87 @@ void calibration_image_selection(cv::Mat &latest_image, cv::Size patternsize, bo
     // therefore, do not have to check for if found
     std::vector<cv::Point2f> corners;
     bool patternfound = findChessboardCorners(latest_image, patternsize, corners);
-    cv::Size winSize(11,11);
-    cv::Size zeroZone(-1,-1);
-    cv::TermCriteria criterial(TermCriteria::EPS + TermCriteria::MAX_ITER, 30, 0.1);
-
-    cv::cornerSubPix(latest_image, corners, Size(11, 11), Size(-1, -1), criterial);
-    std::cout << "Number of corners found: " << corners.size() << std::endl;
+    if (patternfound) {
+        cv::Size winSize(11,11);
+        cv::Size zeroZone(-1,-1);
+        cv::TermCriteria criterial(TermCriteria::EPS + TermCriteria::MAX_ITER, 30, 0.1);
     
-    cv::drawChessboardCorners(latest_image, patternsize, corners, patternfound);
-    // if (corners.size() >= 1) {
-    //     std::cout << "0" << " Corner x and y coordinate is " << corners[0].x << ", " << corners[0].y << std::endl;
-    // }
-    corner_list.push_back(corners);
-    point_list.push_back(point_set);
+        cv::cornerSubPix(latest_image, corners, Size(11, 11), Size(-1, -1), criterial);
+        std::cout << "Number of corners found: " << corners.size() << std::endl;
+        
+        cv::drawChessboardCorners(latest_image, patternsize, corners, patternfound);
+        // if (corners.size() >= 1) {
+        //     std::cout << "0" << " Corner x and y coordinate is " << corners[0].x << ", " << corners[0].y << std::endl;
+        // }
+        corner_list.push_back(corners);
+        point_list.push_back(point_set);
+    }
 }
 
 
-double camera_calibration(int number_of_calibrated_images, int count_png_images, const std::string& directory, cv::Size patternsize, std::vector<cv::Vec3f> point_set, std::vector<std::vector<cv::Vec3f>> point_list, std::vector<std::vector<cv::Point2f>> corner_list) {
+double camera_calibration(
+    int number_of_calibrated_images, 
+    int count_png_images, 
+    const std::string& directory, 
+    cv::Size patternsize, 
+    std::vector<cv::Vec3f> &point_set, 
+    std::vector<std::vector<cv::Vec3f>> &point_list, 
+    std::vector<std::vector<cv::Point2f>> &corner_list, 
+    cv::Mat &camera_matrix, 
+    std::vector<double> &distortion_coefficients,
+    std::vector<cv::Mat> &rotations, 
+    std::vector<cv::Mat> &translations
+) {
     /**
      * Function for task3 calibrate the camera.
      */
 
     // if the number of calibrated image is less than 5, that means this is based on the count_png_images
     // in the folder. So loop thrugh each images and stored those in the other vectors.
-                
+    cv::Size imageSize;
     if ((number_of_calibrated_images >= 5) | (count_png_images >= 5)) {
         std::cout << "Allow to calibrate" << std::endl;
         std::vector<cv::Mat> rvecs, tvecs;
         if (number_of_calibrated_images < 5) {
             std::vector<std::string> png_files;
+
+            // int counter = 0;
             for (const auto& entry : std::filesystem::directory_iterator(directory)) {
                 if (entry.is_regular_file() && entry.path().extension() == ".png") {
                     std::cout << entry.path().string() << std::endl;
                     cv::Mat image = cv::imread(entry.path().string(), IMREAD_GRAYSCALE);
+                    // cv::imshow("img" + std::to_string(counter), image);
+                    imageSize = image.size();
                     calibration_image_selection(image, patternsize, false, point_set, point_list, corner_list);
+                    // counter += 1;
                 }
             }
         }
 
-        // double calibrate_camera = cv::calibrateCamera(point_list)
+        // start calibrating the image
+        // Finds the camera intrinsic and extrinsic parameters from several views of a calibration pattern.
+        // https://docs.opencv.org/3.4/d9/d0c/group__calib3d.html#ga3207604e4b1a1758aa66acb6ed5aa65d
+        if (point_list.empty() || corner_list.empty()) {
+            std::cerr << "Error: objectPoints or imagePoints is empty" << std::endl;
+            return -1;
+        }
+        else {
+            std::cout << "point_list size: " << point_list.size() << std::endl;
+            std::cout << "corner_list size: " << corner_list.size() << std::endl;
+        }
+
+        double calibrate_camera = cv::calibrateCamera(
+            point_list, 
+            corner_list, 
+            imageSize, 
+            camera_matrix, 
+            distortion_coefficients, 
+            rotations, 
+            translations, 
+            cv::CALIB_FIX_ASPECT_RATIO);
+        std::cout << "Calibration performed. Reprojection error: " << calibrate_camera << std::endl;
+        std::cout << "Camera Matrix:\n" << camera_matrix << std::endl;
+        std::cout << "Distortion Coefficients: " << cv::Mat(distortion_coefficients) << std::endl;
     }
     else {
         std::cout << "Not allow to calibrate. Please save more frame.\n" << std::endl;
