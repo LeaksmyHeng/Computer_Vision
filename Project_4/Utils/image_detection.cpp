@@ -54,7 +54,7 @@ void checkboard_corner_detection(cv::Mat &frame, cv::Size patternsize) {
         cv::TermCriteria criterial(TermCriteria::EPS + TermCriteria::MAX_ITER, 30, 0.1);
 
         // https://docs.opencv.org/4.x/dd/d1a/group__imgproc__feature.html#ga354e0d7c86d0d9da75de9b9701a9a87e
-        cv::cornerSubPix(grayscale, corners, Size(11, 11), Size(-1, -1), criterial);
+        cv::cornerSubPix(grayscale, corners, winSize, zeroZone, criterial);
         std::cout << "Number of corners found: " << corners.size() << std::endl;
 
         // draw the target corner and show it
