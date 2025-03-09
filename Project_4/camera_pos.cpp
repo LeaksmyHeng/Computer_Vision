@@ -61,6 +61,14 @@ int main(int argc, char *argv[]) {
         cv::Point3f(0, 0, square_size)      // z-axis
     };
 
+    // For task 6
+    // define an asymmetrical triangular pyramid floating 5cm above the chessboard.
+    std::vector<cv::Point3f> asymmetrical_triangular_points = {
+        cv::Point3f(0, 0, 0.05),      // Base point
+        cv::Point3f(0.05, 0, 0.1),    // Top point
+        cv::Point3f(-0.03, 0.04, 0.08) // Side point
+    };
+
     while (true) {
         *capdev >> frame;
         if( frame.empty() ) {
@@ -116,16 +124,25 @@ int main(int argc, char *argv[]) {
                 // Project axes onto image plane
                 std::vector<cv::Point2f> projected_axis;
 
-                // task 5 Project Outside Corners or 3D Axes
-                // https://docs.opencv.org/3.4/d9/d0c/group__calib3d.html#ga1019495a2c8d1743ed5cc23fa0daff8c
-                // https://www.youtube.com/watch?v=bs81DNsMrnM
-                cv::projectPoints(objectPoints, rvec, tvec, camera_mat, dist_coeffs, projected_axis);
+                // // task 5 Project Outside Corners or 3D Axes
+                // // https://docs.opencv.org/3.4/d9/d0c/group__calib3d.html#ga1019495a2c8d1743ed5cc23fa0daff8c
+                // // https://www.youtube.com/watch?v=bs81DNsMrnM
+                // cv::projectPoints(objectPoints, rvec, tvec, camera_mat, dist_coeffs, projected_axis);
+                // // Draw axes on the frame
+                // if (projected_axis.size() >= 4) {
+                //     cv::line(frame, projected_axis[0], projected_axis[1], cv::Scalar(0, 0, 255), 3); // X
+                //     cv::line(frame, projected_axis[0], projected_axis[2], cv::Scalar(0, 255, 0), 3); // Y
+                //     cv::line(frame, projected_axis[0], projected_axis[3], cv::Scalar(255, 0, 0), 3); // Z
+                // }
+                
+                // task 6
+                // asymmetrical triangular pyramid floating 5cm above the chessboard.
+                cv::projectPoints(asymmetrical_triangular_points, rvec, tvec, camera_mat, dist_coeffs, projected_axis);
                 // Draw axes on the frame
-                if (projected_axis.size() >= 4) {
-                    cv::line(frame, projected_axis[0], projected_axis[1], cv::Scalar(0, 0, 255), 3); // X
-                    cv::line(frame, projected_axis[0], projected_axis[2], cv::Scalar(0, 255, 0), 3); // Y
-                    cv::line(frame, projected_axis[0], projected_axis[3], cv::Scalar(255, 0, 0), 3); // Z
-                }            
+                cv::line(frame, projected_axis[0], projected_axis[1], cv::Scalar(0, 255, 0), 2); // Base to top
+                cv::line(frame, projected_axis[0], projected_axis[2], cv::Scalar(255, 0, 0), 2); // Base to side
+                cv::line(frame, projected_axis[1], projected_axis[2], cv::Scalar(0, 0, 255), 2); // Top to side
+                
             }
         }
         
