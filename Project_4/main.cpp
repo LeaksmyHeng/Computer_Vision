@@ -109,6 +109,7 @@ int main(int argc, char *argv[]) {
             // increment the number of calibrated image
             number_of_calibrated_images += 1;
         }
+        
         // if users press c or C, calibrate the image if possible
         else if (key == 'c' || key == 'C') {
             // if this is less than 5, check the folders to see if there are at least 5 png file in there, if it is,
@@ -141,15 +142,15 @@ int main(int argc, char *argv[]) {
                 std::cout << "Saving to file" << std::endl;
                 // call save to file function
                 std::string fileName = "output_file.csv";
-                saveCalibrationResults(camera_matrix, distortion_coefficients, fileName);
+                write_calibration_to_csv(camera_matrix, distortion_coefficients, fileName);
             }
             else {
                 std::cout << "Okay not saving then." << std::endl;
             }
-
         }
 
         // call the chess board corner detection
+        // uncomment this if you just want to do task 1
         checkboard_corner_detection(frame, patternsize);
         cv::imshow("Video", frame);
     }

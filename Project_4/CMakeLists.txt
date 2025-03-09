@@ -9,7 +9,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
 
-add_executable(project_4 main.cpp Utils/image_detection.cpp Utils/utils.cpp)
+# uncomment this if you want to run task 1 to 3
+# add_executable(project_4 main.cpp Utils/image_detection.cpp Utils/utils.cpp)
+# this is for task 4
+add_executable(project_4 camera_pos.cpp Utils/image_detection.cpp Utils/utils.cpp)
 target_link_libraries(project_4 ${OpenCV_LIBS})
 
 include(CTest)

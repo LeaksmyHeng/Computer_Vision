@@ -54,17 +54,82 @@ int count_png_file(const std::string& directory) {
 }
 
 
-void saveCalibrationResults(const cv::Mat& camera_matrix, const std::vector<double>& distortion_coefficients, const std::string& filename) {
+void write_calibration_to_csv(const cv::Mat& camera_matrix, const std::vector<double>& distortion_coefficients, const std::string& filename) {
     /**
      * Function to save camera instrinsic value to file.
      */
-    std::ofstream outfile(filename);
-    if (outfile.is_open()) {
-        outfile << "Camera Matrix:\n" << camera_matrix << "\n\n";
-        outfile << "Distortion Coefficients:\n" << cv::Mat(distortion_coefficients) << "\n";
-        outfile.close();
-        std::cout << "Calibration results saved to " << filename << std::endl;
-    } else {
-        std::cerr << "Unable to open file for saving calibration results." << std::endl;
+    // Open the file for writing
+    std::ofstream file(filename);
+    if (!file.is_open()) {
+        std::cerr << "Unable to open file for writing!" << std::endl;
+        return;
     }
+
+    // Write the camera matrix
+    file << "Camera Matrix\n";
+    for (int i = 0; i < camera_matrix.rows; ++i) {
+        for (int j = 0; j < camera_matrix.cols; ++j) {
+            file << camera_matrix.at<double>(i, j);
+            if (j < camera_matrix.cols - 1) file << ","; // Add a comma between values
+        }
+        file << "\n"; // New line after each row
+    }
+
+    // Write the distortion coefficients
+    file << "Distortion Coefficients\n";
+    for (size_t i = 0; i < distortion_coefficients.size(); ++i) {
+        file << distortion_coefficients[i];
+        if (i < distortion_coefficients.size() - 1) file << ","; // Add a comma between values
+    }
+    file << "\n";
+    // Close the file
+    file.close();
+}
+
+
+void read_calibration_from_csv(const std::string& filename, cv::Mat& cameraMatrix, cv::Mat& distCoeffs) {
+    /**
+     * Function to read camera instrinsic value from csv file.
+     */
+    std::ifstream file(filename);
+    if (!file.is_open()) {
+        std::cout << "Unable to open file for reading!" << std::endl;
+        return;
+    }
+
+    std::string line;
+    bool readingCameraMatrix = false;
+    bool readingDistCoeffs = false;
+
+    int row = 0;
+    while (getline(file, line)) {
+        if (line.find("Camera Matrix") != std::string::npos) {
+            readingCameraMatrix = true;
+            readingDistCoeffs = false;
+            row = 0;
+            continue;
+        } else if (line.find("Distortion Coefficients") != std::string::npos) {
+            readingCameraMatrix = false;
+            readingDistCoeffs = true;
+            row = 0;
+            continue;
+        }
+
+        std::stringstream ss(line);
+        std::string value;
+
+        if (readingCameraMatrix) {
+            int col = 0;
+            while (getline(ss, value, ',')) {
+                cameraMatrix.at<double>(row, col++) = std::stod(value);
+            }
+            row++;
+        } else if (readingDistCoeffs) {
+            int col = 0;
+            while (getline(ss, value, ',')) {
+                distCoeffs.at<double>(row++, col) = std::stod(value);
+            }
+        }
+    }
+    file.close();
 }
