@@ -6,7 +6,7 @@ Project3
 This is some other helper functions used across this project.
 */
 
-
+#include <opencv2/opencv.hpp>
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -51,4 +51,20 @@ int count_png_file(const std::string& directory) {
         }
     }
     return total;
+}
+
+
+void saveCalibrationResults(const cv::Mat& camera_matrix, const std::vector<double>& distortion_coefficients, const std::string& filename) {
+    /**
+     * Function to save camera instrinsic value to file.
+     */
+    std::ofstream outfile(filename);
+    if (outfile.is_open()) {
+        outfile << "Camera Matrix:\n" << camera_matrix << "\n\n";
+        outfile << "Distortion Coefficients:\n" << cv::Mat(distortion_coefficients) << "\n";
+        outfile.close();
+        std::cout << "Calibration results saved to " << filename << std::endl;
+    } else {
+        std::cerr << "Unable to open file for saving calibration results." << std::endl;
+    }
 }

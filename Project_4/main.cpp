@@ -130,6 +130,22 @@ int main(int argc, char *argv[]) {
                 distortion_coefficients,
                 rotations,
                 translations);
+            
+            // enable users to save rotations and translations
+            // the prompt will pop up to ask if users want to write out the intrinsic parameters to a file
+            // both the camera_matrix and the distortion_ceofficients
+            char decision;
+            std::cout << "Do you want to save the intrinsic parameters to file? Type Y for yes otherwise type whatever. ";
+            std::cin >> decision;
+            if (decision == 'Y' || decision == 'y') {
+                std::cout << "Saving to file" << std::endl;
+                // call save to file function
+                std::string fileName = "output_file.csv";
+                saveCalibrationResults(camera_matrix, distortion_coefficients, fileName);
+            }
+            else {
+                std::cout << "Okay not saving then." << std::endl;
+            }
 
         }
 
