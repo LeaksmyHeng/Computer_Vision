@@ -61,12 +61,23 @@ int main(int argc, char *argv[]) {
         cv::Point3f(0, 0, square_size)      // z-axis
     };
 
-    // For task 6
-    // define an asymmetrical triangular pyramid floating 5cm above the chessboard.
-    std::vector<cv::Point3f> asymmetrical_triangular_points = {
-        cv::Point3f(0, 0, 0.05),      // Base point
-        cv::Point3f(0.05, 0, 0.1),    // Top point
-        cv::Point3f(-0.03, 0.04, 0.08) // Side point
+    // // For task 6
+    // // define an asymmetrical triangular pyramid floating 5cm above the chessboard.
+    // std::vector<cv::Point3f> asymmetrical_triangular_points = {
+    //     cv::Point3f(0, 0, 0.05),      // Base point
+    //     cv::Point3f(0.05, 0, 0.1),    // Top point
+    //     cv::Point3f(-0.03, 0.04, 0.08) // Side point
+    // };
+    // cube
+    std::vector<cv::Point3f> cube_points = {
+        cv::Point3f(0, 0, 0),       // Bottom-front-left
+        cv::Point3f(0.05, 0, 0),    // Bottom-front-right
+        cv::Point3f(0.05, 0.05, 0), // Bottom-back-right
+        cv::Point3f(0, 0.05, 0),    // Bottom-back-left
+        cv::Point3f(0, 0, -0.05),   // Top-front-left
+        cv::Point3f(0.05, 0, -0.05),// Top-front-right
+        cv::Point3f(0.05, 0.05, -0.05),// Top-back-right
+        cv::Point3f(0, 0.05, -0.05) // Top-back-left
     };
 
     while (true) {
@@ -137,12 +148,31 @@ int main(int argc, char *argv[]) {
                 
                 // task 6
                 // asymmetrical triangular pyramid floating 5cm above the chessboard.
-                cv::projectPoints(asymmetrical_triangular_points, rvec, tvec, camera_mat, dist_coeffs, projected_axis);
-                // Draw axes on the frame
-                cv::line(frame, projected_axis[0], projected_axis[1], cv::Scalar(0, 255, 0), 2); // Base to top
-                cv::line(frame, projected_axis[0], projected_axis[2], cv::Scalar(255, 0, 0), 2); // Base to side
-                cv::line(frame, projected_axis[1], projected_axis[2], cv::Scalar(0, 0, 255), 2); // Top to side
+                // cv::projectPoints(asymmetrical_triangular_points, rvec, tvec, camera_mat, dist_coeffs, projected_axis);
+                cv::projectPoints(cube_points, rvec, tvec, camera_mat, dist_coeffs, projected_axis);
                 
+                // // Draw axes on the frame
+                // cv::line(frame, projected_axis[0], projected_axis[1], cv::Scalar(0, 255, 0), 2); // Base to top
+                // cv::line(frame, projected_axis[0], projected_axis[2], cv::Scalar(255, 0, 0), 2); // Base to side
+                // cv::line(frame, projected_axis[1], projected_axis[2], cv::Scalar(0, 0, 255), 2); // Top to side
+                
+                // Draw bottom face edges
+                cv::line(frame, projected_axis[0], projected_axis[1], cv::Scalar(255, 0, 0), 2);
+                cv::line(frame, projected_axis[1], projected_axis[2], cv::Scalar(255, 0, 0), 2);
+                cv::line(frame, projected_axis[2], projected_axis[3], cv::Scalar(255, 0, 0), 2);
+                cv::line(frame, projected_axis[3], projected_axis[0], cv::Scalar(255, 0, 0), 2);
+
+                // Draw top face edges
+                cv::line(frame, projected_axis[4], projected_axis[5], cv::Scalar(0, 255, 0), 2);
+                cv::line(frame, projected_axis[5], projected_axis[6], cv::Scalar(0, 255, 0), 2);
+                cv::line(frame, projected_axis[6], projected_axis[7], cv::Scalar(0, 255, 0), 2);
+                cv::line(frame, projected_axis[7], projected_axis[4], cv::Scalar(0, 255, 0), 2);
+
+                // Draw vertical edges connecting top and bottom faces
+                cv::line(frame, projected_axis[0], projected_axis[4], cv::Scalar(0, 0, 255), 2);
+                cv::line(frame, projected_axis[1], projected_axis[5], cv::Scalar(0, 0, 255), 2);
+                cv::line(frame, projected_axis[2], projected_axis[6], cv::Scalar(0, 0, 255), 2);
+                cv::line(frame, projected_axis[3], projected_axis[7], cv::Scalar(0, 0, 255), 2);
             }
         }
         

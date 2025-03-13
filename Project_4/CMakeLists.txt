@@ -13,6 +13,7 @@ set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
 # add_executable(project_4 main.cpp Utils/image_detection.cpp Utils/utils.cpp)
 # this is for task 4
 add_executable(project_4 camera_pos.cpp Utils/image_detection.cpp Utils/utils.cpp)
+# add_executable(project_4 harris_corner.cpp Utils/image_detection.cpp Utils/utils.cpp)
 target_link_libraries(project_4 ${OpenCV_LIBS})
 
 include(CTest)

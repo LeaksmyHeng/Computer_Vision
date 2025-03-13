@@ -31,7 +31,7 @@ bool deleteFile(const std::string& source) {
     /**
      * Function to delete file.
      */
-    int status = remove("myfile.txt");
+    int status = std::filesystem::remove(source);
     // Check if the file has been successfully removed
     if (status != 0) {
         return false;
