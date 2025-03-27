@@ -15,7 +15,7 @@ from Project_5.buildingNetworks import Net
 from Project_5.gettingData import Project
 
 
-def analyzing_model():
+def analyzing_model(model_path: str):
     """
     Task2A: Analyze the first layer. In this task, I get the summary of the model and
     accessing the weight of the first layer in the network then plot it out.
@@ -23,7 +23,7 @@ def analyzing_model():
     # initialize the network
     network = Net()
     # load the model or network from model.pth
-    network.load_state_dict(torch.load('model.pth'))
+    network.load_state_dict(torch.load(model_path))
 
     # This is to read the summary of the network
     vgg = models.vgg16()
@@ -61,7 +61,7 @@ def analyzing_model():
     plt.show()
 
 
-def applying_filters():
+def applying_filters(model_path: str):
     """
     In this task, I applied the filters that we see on the function above onto to the training set.
     Generate a plot of the 10 filtered images
@@ -69,7 +69,7 @@ def applying_filters():
     # initialize the network
     network = Net()
     # load the model or network from model.pth
-    network.load_state_dict(torch.load('model.pth'))
+    network.load_state_dict(torch.load(model_path))
 
     with torch.no_grad():
 
