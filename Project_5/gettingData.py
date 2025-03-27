@@ -24,7 +24,7 @@ class Project:
         torch.backends.cudnn.enabled = False
         torch.manual_seed(self.random_seed)
 
-    def get_mnist_training_dataset(self):
+    def get_mnist_training_dataset(self, is_shuffle=True):
         """
         Task 1A. Get the MNIST digit data set.
         Function to download the training MNIST dataset.
@@ -42,7 +42,7 @@ class Project:
                                                 torchvision.transforms.Normalize((0.1307,), (0.3081,))
                                                 ])
                                            ),
-                batch_size=self.batch_size_train, shuffle=False)
+                batch_size=self.batch_size_train, shuffle=is_shuffle)
             logger.info(f'Length of training data set is {len(training_data)}.')
 
         except Exception as e:
@@ -50,7 +50,7 @@ class Project:
 
         return training_data
 
-    def get_mnist_test_dataset(self):
+    def get_mnist_test_dataset(self, is_shuffle=True):
         """
         Task 1A. Get the MNIST digit data set.
         Function to download the test MNIST dataset.
@@ -68,7 +68,7 @@ class Project:
                                                [torchvision.transforms.ToTensor(),
                                                 torchvision.transforms.Normalize((0.1307,), (0.3081,))]
                                            )),
-                batch_size=self.batch_size_test, shuffle=False)
+                batch_size=self.batch_size_test, shuffle=is_shuffle)
             logger.info(f'Length of test data set is {len(test_data)}.')
 
         except Exception as e:
@@ -85,7 +85,8 @@ class Project:
         https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.subplots.html
         https://www.linkedin.com/pulse/deep-learning-action-building-training-neural-network-rany-yvuic
         """
-        test_loader = self._get_mnist_test_dataset()
+        # Grab the data but do not shuffle it as per instruction
+        test_loader = self.get_mnist_test_dataset(is_shuffle=False)
         examples = enumerate(test_loader)
         batch_idx, (example_data, example_targets) = next(examples)
 
