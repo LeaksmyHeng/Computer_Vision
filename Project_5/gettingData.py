@@ -100,3 +100,6 @@ class Project:
 
         plt.tight_layout()
         plt.show(block=True)
+
+
+Project().plot()

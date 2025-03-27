@@ -152,7 +152,6 @@ def train_network():
     test_losses = []
     test_counter = [i*len(train_loader.dataset) for i in range(Constants.N_EPOCHS + 1)]
 
-    # 5 epoch in total
     # one epoch at a time
     test(network, test_loader, test_losses)
     for epoch in range(1, Constants.N_EPOCHS + 1):
