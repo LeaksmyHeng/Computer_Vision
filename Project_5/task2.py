@@ -2,7 +2,7 @@
 Leaksmy Heng
 March 26, 2025
 CS5330
-Project5: Recognition using Deep Networks
+Project5: Recognition using Deep Networks - Task 2
 """
 
 import cv2

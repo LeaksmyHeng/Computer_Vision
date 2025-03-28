@@ -161,7 +161,6 @@ def train_network():
         test(network, test_loader, test_losses)
 
     # Plot the training and testing accuracy in a graph
-
     logger.info('Train counter is: ', train_counter)
     logger.info('Train loss is:', train_losses)
     logger.info('Tet counter is:', test_counter)

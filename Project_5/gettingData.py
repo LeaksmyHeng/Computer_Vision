@@ -59,7 +59,6 @@ class Project:
         https://github.com/pytorch/examples/issues/653
         """
         try:
-
             test_data = torch.utils.data.DataLoader(
                 torchvision.datasets.MNIST('/files/',
                                            train=False,
