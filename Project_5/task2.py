@@ -104,5 +104,5 @@ def applying_filters(model_path: str):
 
 
 
-# analyzing_model()
-# applying_filters()
+# analyzing_model('model.pth')
+# applying_filters('model.pth')

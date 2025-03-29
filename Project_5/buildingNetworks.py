@@ -104,6 +104,8 @@ def train(epoch: int, network: Net, train_loader: torch.utils.data.DataLoader, o
             torch.save(network.state_dict(), 'model.pth')
             torch.save(optimizer.state_dict(), 'optimizer.pth')
 
+    return train_losses, train_counter
+
 
 def test(network, test_loader, test_losses):
     """Function to test the network.
@@ -128,6 +130,7 @@ def test(network, test_loader, test_losses):
     test_loss /= len(test_loader.dataset)
     test_losses.append(test_loss)
     print(f'\nTest set: Avg. loss: {test_loss}, Accuracy: {correct}/{len(test_loader.dataset)} ({100. * correct / len(test_loader.dataset)}%)\n')
+    return test_loader, test_losses
 
 
 def train_network():
@@ -153,12 +156,12 @@ def train_network():
     test_counter = [i*len(train_loader.dataset) for i in range(Constants.N_EPOCHS + 1)]
 
     # one epoch at a time
-    test(network, test_loader, test_losses)
+    test_loader, test_losses = test(network, test_loader, test_losses)
     for epoch in range(1, Constants.N_EPOCHS + 1):
         # Train the network
-        train(epoch, network, train_loader, optimizer, train_losses, train_counter)
+        train_losses, train_counter = train(epoch, network, train_loader, optimizer, train_losses, train_counter)
         # test the network
-        test(network, test_loader, test_losses)
+        test_loader, test_losses = test(network, test_loader, test_losses)
 
     # Plot the training and testing accuracy in a graph
     logger.info('Train counter is: ', train_counter)

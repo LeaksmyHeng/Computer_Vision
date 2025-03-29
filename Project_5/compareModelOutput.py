@@ -16,7 +16,7 @@ from Project_5.buildingNetworks import Net
 from Project_5.gettingData import Project
 
 
-def compare_model_output(test_batch):
+def compare_model_output(test_batch, test_label):
     """
     Function to compare the output between what the model show and what it actually is.
     """
@@ -27,6 +27,14 @@ def compare_model_output(test_batch):
         network.load_state_dict(torch.load('model.pth'))
         network.eval()
         output = network(test_batch)
+        _, predicted = torch.max(output, 1)
+        # print output
+        for i in range(len(test_batch)):
+            print(f"\nImage {i + 1}")
+            formatted_output = [f"{value:.2f}" for value in output[i].data.numpy()]
+            print("Network Output:", formatted_output)
+            print("Predicted Label:", predicted[i].item())
+            print("Actual Label:", test_label[i])
 
         # Create a 3x3 grid for 9 examples
         plt.figure(figsize=(12, 5))
@@ -43,7 +51,7 @@ def compare_model_output(test_batch):
             pred = output.data.max(1, keepdim=True)[1][i].item()
 
             # Show prediction
-            plt.title(f"Prediction: {pred}\n")
+            plt.title(f"Pred: {pred} & Actual: {test_label[i]}\n")
             plt.xticks([])
             plt.yticks([])
 
@@ -93,6 +101,11 @@ def compare_my_hand_written_data():
             with torch.no_grad():
                 output = network(tensor)
                 pred = output.argmax(dim=1, keepdim=True).item()
+                print(f"\nImage: {image_path}")
+                formatted_output = [f"{value:.2f}" for value in output.flatten().detach().numpy()]
+                print("Network Output:", formatted_output)
+                print("Predicted Label:", pred)
+                print("Actual Label:", image_path.split('.')[0][-1])
 
             # Create subplot
             plt.subplot(3, 4, counter + 1)
@@ -100,7 +113,7 @@ def compare_my_hand_written_data():
 
             # Plot image and prediction
             plt.imshow(im, cmap='gray', interpolation='none')
-            plt.title(f"Prediction: {pred}\n")
+            plt.title(f"Pred: {pred} & Actual: {image_path.split('.')[0][-1]}")
             plt.xticks([])
             plt.yticks([])
 
@@ -114,7 +127,8 @@ if __name__ == '__main__':
     # # get test data and use the non-shuffle version
     # test_loader = Project().get_mnist_test_dataset(is_shuffle=False)
     # test_images = [test_loader.dataset[i][0] for i in range(10)]
+    # test_labels = [test_loader.dataset[i][1] for i in range(10)]
     # test_batch = torch.stack(test_images)
-    # compare_model_output(test_batch)
+    # compare_model_output(test_batch, test_labels)
 
     compare_my_hand_written_data()
